@@ -3,11 +3,14 @@ import { Metadata, Viewport } from "next";
 import { Link } from "@heroui/link";
 import clsx from "clsx";
 
-import { Providers } from "./providers";
+
 
 import { siteConfig } from "@/src/config/site";
 import { fontSans } from "@/src/config/fonts";
 import { Navbar } from "@/src/components/navbar";
+import NextUiProviders from "../components/providers/nextui-provider/NextuiProviders";
+import RootModal from "../components/general components/modal/RootModal";
+import TestModal from "../components/test modal/TestModal";
 
 export const metadata: Metadata = {
   title: {
@@ -41,11 +44,13 @@ export default function RootLayout({
           fontSans.variable,
         )}
       >
-        <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
+        <NextUiProviders themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="relative flex flex-col h-screen">
             <Navbar />
             <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">
+              <TestModal/>
               {children}
+
             </main>
             <footer className="w-full flex items-center justify-center py-3">
               <Link
@@ -59,7 +64,8 @@ export default function RootLayout({
               </Link>
             </footer>
           </div>
-        </Providers>
+          <RootModal/>
+        </NextUiProviders>
       </body>
     </html>
   );

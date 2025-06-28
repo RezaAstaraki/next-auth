@@ -1,0 +1,16 @@
+#custom-date-picker::placeholder {
+    font-size: 14px;
+}
+
+#custom-date-picker {
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 10px;
+    background-color: #f4f4f5;
+    border-color: transparent;
+}
+
+.rmdp-container {
+    width: 100% !important;
+    position: relative !important;
+}
