@@ -15,7 +15,7 @@ export default function TestModal({}: Props) {
 
         <Button
         onPress={()=>{
-            d(setModalOpen({type:'ss' ,size:'3xl',payloadData:'sss', isDraggable:true}))
+            d(setModalOpen({type:'ss' ,size:'3xl',payloadData:'sss',placement:"top", isDraggable:true,backdrop:"opaque"}))
         }}
         
         >open root modal</Button>

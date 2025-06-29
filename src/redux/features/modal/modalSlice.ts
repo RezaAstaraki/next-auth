@@ -20,7 +20,7 @@ type typeInitialStates = {
   type: string;
   size?: typeSizes;
   payloadData?: any;
-  isCloseAllowed: boolean;
+  isCloseAllowed?: boolean;
   scrollBehavior: "inside" | "normal" | "outside";
   isDismissable?: boolean;
   placement?:
@@ -67,10 +67,11 @@ const ModalSlice = createSlice({
       state,
       action: PayloadAction<{
         type: string;
+        isCloseAllowed?: typeInitialStates["isCloseAllowed"];
         size?: typeSizes;
         scrollBehavior?: "inside" | "normal" | "outside";
         payloadData?: any;
-        isDismissable?: true;
+        isDismissable?: typeInitialStates["isDismissable"];
         placement?: typeInitialStates["placement"];
         backdrop?: typeInitialStates["backdrop"];
         isDraggable?: typeInitialStates["isDraggable"];
@@ -85,21 +86,22 @@ const ModalSlice = createSlice({
       state.placement = action.payload.placement;
       state.isDraggable = action.payload.isDraggable;
       state.modalTitle = action.payload.modalTitle;
+      state.isCloseAllowed = action.payload.isCloseAllowed;
+      state.backdrop = action.payload.backdrop;
     },
 
     // Action to close the modal (only if closing is allowed)
     setModalClose: (state) => {
-      if (state.isCloseAllowed) {
+      if (state.isCloseAllowed || state.isCloseAllowed==undefined) {
         // Check if closing the modal is allowed
         state.type = "";
         state.payloadData = null;
         state.size = undefined;
         state.isDismissable = undefined;
-        state.placement = undefined
-        state.isDraggable = true
-        state.modalTitle = undefined
+        state.placement = undefined;
+        state.isDraggable = true;
+        state.modalTitle = undefined;
         state.isOpen = false;
-        
       }
     },
 
