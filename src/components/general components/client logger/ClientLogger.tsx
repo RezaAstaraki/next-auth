@@ -1,3 +1,4 @@
+'use client'
 import { ClientLogger as ClientLoggerClient } from "react-a2z";
 
 type Props = {
