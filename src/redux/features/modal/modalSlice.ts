@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ReactNode } from "react";
 
 // Defining a custom type for modal sizes
 export type typeSizes =
@@ -15,7 +14,7 @@ export type typeSizes =
   | "full";
 
 // Defining the initial state type for the modal slice
-type typeInitialStates = {
+type ModalInitialStatesType = {
   isOpen: boolean;
   type: string;
   size?: typeSizes;
@@ -36,7 +35,7 @@ type typeInitialStates = {
 };
 
 // Defining the initial state for the modal
-const initialState: typeInitialStates = {
+const initialState: ModalInitialStatesType = {
   isOpen: false,
   isCloseAllowed: true,
   type: "",
@@ -67,15 +66,15 @@ const ModalSlice = createSlice({
       state,
       action: PayloadAction<{
         type: string;
-        isCloseAllowed?: typeInitialStates["isCloseAllowed"];
-        size?: typeSizes;
-        scrollBehavior?: "inside" | "normal" | "outside";
         payloadData?: any;
-        isDismissable?: typeInitialStates["isDismissable"];
-        placement?: typeInitialStates["placement"];
-        backdrop?: typeInitialStates["backdrop"];
-        isDraggable?: typeInitialStates["isDraggable"];
-        modalTitle?: typeInitialStates["modalTitle"];
+        isCloseAllowed?: ModalInitialStatesType["isCloseAllowed"];
+        size?: typeSizes;
+        scrollBehavior?: ModalInitialStatesType["scrollBehavior"];
+        isDismissable?: ModalInitialStatesType["isDismissable"];
+        placement?: ModalInitialStatesType["placement"];
+        backdrop?: ModalInitialStatesType["backdrop"];
+        isDraggable?: ModalInitialStatesType["isDraggable"];
+        modalTitle?: ModalInitialStatesType["modalTitle"];
       }>
     ) => {
       state.isOpen = true;
