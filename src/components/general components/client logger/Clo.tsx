@@ -9,7 +9,7 @@ type Props = {
   indent?: number;
 };
 
-export default function ClientLogger({
+export default function Clo({
   data,
   label,
   showDataInUi,
