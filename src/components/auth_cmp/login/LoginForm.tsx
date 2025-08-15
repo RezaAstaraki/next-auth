@@ -5,6 +5,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema, LoginSchemaType } from "@/schemas/authSchemas";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
+import Clo from "../../general components/client logger/Clo";
+import { useQuery } from "@tanstack/react-query";
+import { getCaptcha } from "@/actions/authActions";
 
 type Props = {};
 
@@ -25,25 +28,35 @@ export default function LoginForm({}: Props) {
   const onsubmit = (data: LoginSchemaType) => {
     console.log(data);
   };
+
+  const { data, error, isLoading, isFetched, isFetching, isPending, status } =
+    useQuery({ queryKey: ["getCaptchaKey"], queryFn: getCaptcha });
+
   return (
-    <form onSubmit={handleSubmit(onsubmit)} className="flex flex-col space-y-2">
-      <div>
-        <Input
-          type="text"
-          {...register("email")}
-          errorMessage={errors.email && errors.email.message}
-          isInvalid={!!errors.email}
-        />
-      </div>
-      <div>
-        <Input
-          type="password"
-          {...register("password")}
-          errorMessage={errors.password?.message}
-          isInvalid={!!errors.password}
-        />
-      </div>
-      <Button type="submit">log in</Button>
-    </form>
+    <>
+      <Clo data={data} />
+      <form
+        onSubmit={handleSubmit(onsubmit)}
+        className="flex flex-col space-y-2"
+      >
+        <div>
+          <Input
+            type="text"
+            {...register("email")}
+            errorMessage={errors.email && errors.email.message}
+            isInvalid={!!errors.email}
+          />
+        </div>
+        <div>
+          <Input
+            type="password"
+            {...register("password")}
+            errorMessage={errors.password?.message}
+            isInvalid={!!errors.password}
+          />
+        </div>
+        <Button type="submit">log in</Button>
+      </form>
+    </>
   );
 }

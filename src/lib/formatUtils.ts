@@ -1,5 +1,3 @@
-import { format, IntlFormatFormatOptions, parseISO } from "date-fns";
-
 export const formatToPersianNumber = (
   num: number | null | undefined
 ): string => {
@@ -24,28 +22,6 @@ export const formatDate = (dateString: string | null | undefined): string => {
     return dateString || "";
   }
 };
-
-// export const dateFormatter = async () => {
-//   const f = await getFormatter();
-
-//   const s = (input: string) => {
-//     return f.dateTime(parseISO(input), {
-//       year: "numeric",
-//       month: "numeric",
-//       day: "numeric",
-//       hour: "numeric",
-//       minute: "numeric",
-//     });
-//   };
-//   return s;
-// };
-export function formatISODate(dateString: string): string {
-  // Parse the ISO date string into a Date object
-  const date = dateString && parseISO(dateString);
-
-  // Format the Date object into the desired format
-  return date && format(date, "yyyy-MM-dd hh:mm:ss a");
-}
 
 export const formatSecondsToMinutes = (second: number) => {
   const minutes = Math.floor(second / 60);
