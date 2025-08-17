@@ -2,7 +2,12 @@
 
 import { ApiResponse } from "./types";
 
-export async function getCaptcha(): Promise<ApiResponse<any>> {
+type CaptchaType = {
+  img: string;
+  cpCode: string;
+};
+
+export async function getCaptcha(): Promise<ApiResponse<CaptchaType>> {
   try {
     const res = await fetch("https://customerapi.tavanastore.ir/v1/Captcha", {
       headers: {
@@ -10,6 +15,8 @@ export async function getCaptcha(): Promise<ApiResponse<any>> {
         accept: "text/plain",
       },
     });
+
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const data = await res.json();
     return data;

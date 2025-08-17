@@ -12,7 +12,7 @@ type Props = {
 export default function Clo({
   data,
   label,
-  showDataInUi,
+  showDataInUi=true,
   showDataConsole,
   indent,
 }: Props) {
