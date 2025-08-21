@@ -1,7 +1,12 @@
 "use server";
 
-import { LoginSchema, LoginSchemaType } from "@/schemas/authSchemas";
+import {
+  LoginSchema,
+  LoginSchemaType,
+  OtpSchemaType,
+} from "@/schemas/authSchemas";
 import { ApiResponse } from "./types";
+import { ServerSignIn } from "@/auth_setup/next_auth";
 
 type CaptchaType = {
   img: string;
@@ -32,7 +37,7 @@ export async function getCaptcha(): Promise<ApiResponse<CaptchaType>> {
 }
 
 export async function sendSms(
-  data: LoginSchemaType
+  data: LoginSchemaType,
 ): Promise<ApiResponse<any>> {
   const parsedData = LoginSchema.safeParse(data);
   if (!parsedData.success) {
@@ -43,16 +48,19 @@ export async function sendSms(
     };
   }
 
-  console.log(parsedData)
+  console.log(parsedData);
 
   try {
-    const res = await fetch("https://customerapi.tavanastore.ir/v1/Auth/SendSms", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const res = await fetch(
+      "https://customerapi.tavanastore.ir/v1/Auth/SendSms",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(parsedData.data),
       },
-      body: JSON.stringify(parsedData.data),
-    });
+    );
 
     // await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -69,3 +77,14 @@ export async function sendSms(
     };
   }
 }
+
+export const test = async () => {
+  return { hello: "world" };
+  // throw new Error("test error");
+};
+
+export const signInOtp = async (data: OtpSchemaType) => {
+  //  const fromData = new FormData(data)
+
+  await ServerSignIn("otp", data);
+};

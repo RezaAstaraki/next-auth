@@ -11,6 +11,7 @@ import { Navbar } from "@/src/components/navbar";
 import NextUiProviders from "../components/providers/nextui-provider/NextuiProviders";
 import RootModal from "../components/general components/modal/RootModal";
 import TestModal from "../components/test modal/TestModal";
+import { auth } from "@/auth_setup/next_auth";
 
 export const metadata: Metadata = {
   title: {
@@ -30,18 +31,20 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const a = await auth();
+
   return (
     <html suppressHydrationWarning lang="en">
       <head />
       <body
         className={clsx(
           "min-h-screen text-foreground bg-background font-sans antialiased",
-          fontSans.variable
+          fontSans.variable,
         )}
       >
         <NextUiProviders
@@ -51,6 +54,9 @@ export default function RootLayout({
             <Navbar />
             <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">
               <TestModal />
+
+              <pre>{JSON.stringify(a, null, 2)}</pre>
+
               {children}
             </main>
             <footer className="w-full flex text-xs items-center justify-center py-3">

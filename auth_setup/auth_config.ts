@@ -5,13 +5,15 @@ export const authConfig = {
   session: { strategy: "jwt" },
   providers: [
     Credentials({
+      id: "otp",
       credentials: {
-        username: { label: "Username" },
-        password: { label: "Password", type: "password" },
+        username: { label: "OTP CODE " },
+        // password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         console.log("credentials in auth config", credentials);
-        // return {user:credentials.username}
+        // return {user:credentials.username}in
+        return { id: "1", name: "test", email: "dd", hh: "custom" };
 
         return null;
       },
