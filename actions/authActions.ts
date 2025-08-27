@@ -1,12 +1,15 @@
 "use server";
 
+import { decode, getToken } from "next-auth/jwt";
+
 import {
   LoginSchema,
   LoginSchemaType,
   OtpSchemaType,
 } from "@/schemas/authSchemas";
 import { ApiResponse } from "./types";
-import { ServerSignIn } from "@/auth_setup/next_auth";
+import { ServerSignIn, ServerSignOut } from "@/auth_setup/next_auth";
+import { cookies } from "next/headers";
 
 type CaptchaType = {
   img: string;
@@ -37,7 +40,7 @@ export async function getCaptcha(): Promise<ApiResponse<CaptchaType>> {
 }
 
 export async function sendSms(
-  data: LoginSchemaType,
+  data: LoginSchemaType
 ): Promise<ApiResponse<any>> {
   const parsedData = LoginSchema.safeParse(data);
   if (!parsedData.success) {
@@ -48,8 +51,6 @@ export async function sendSms(
     };
   }
 
-  console.log(parsedData);
-
   try {
     const res = await fetch(
       "https://customerapi.tavanastore.ir/v1/Auth/SendSms",
@@ -59,7 +60,7 @@ export async function sendSms(
           "Content-Type": "application/json",
         },
         body: JSON.stringify(parsedData.data),
-      },
+      }
     );
 
     // await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -84,7 +85,31 @@ export const test = async () => {
 };
 
 export const signInOtp = async (data: OtpSchemaType) => {
-  //  const fromData = new FormData(data)
+  try {
+    //  const fromData = new FormData(data)
 
-  await ServerSignIn("otp", data);
+    await ServerSignIn("otp", data);
+  } catch (e) {
+    console.log(e);
+    throw e;
+  }
+};
+
+export const signoutAction = async () => {
+  await ServerSignOut({ redirect: true });
+};
+
+export const getTokenAction = async () => {
+  const to = (await cookies()).get("authjs.session-token")?.value;
+
+  if (!to) return null;
+
+  const ss = await decode({
+    token: to,
+    secret: process.env.AUTH_SECRET || "",
+    salt: "authjs.session-token",
+  });
+  console.log("ss", JSON.stringify(ss, null, 2));
+
+  return ss;
 };

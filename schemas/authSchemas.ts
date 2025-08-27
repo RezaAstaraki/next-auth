@@ -7,5 +7,7 @@ export const LoginSchema = z.object({
 });
 export type LoginSchemaType = z.infer<typeof LoginSchema>;
 
-export const otpSchema = z.object({ otp: z.string() });
+export const otpSchema = z.object({
+  otpCode: z.string().min(4, "should be 4  digit"),
+});
 export type OtpSchemaType = z.infer<typeof otpSchema>;
