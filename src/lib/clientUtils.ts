@@ -1,4 +1,5 @@
 import { UseFormReturn } from "react-hook-form";
+import { toast } from "sonner";
 import z, { ZodObject } from "zod";
 
 export const clientUrlMaker = (endPoint: string) => {
@@ -16,14 +17,21 @@ export const unAuthorizeHeader = () => {
   };
 };
 
+type MinimalForm<T> = Pick<UseFormReturn<any>, "setError">;
+
 export async function handleFetchResponseClient(
   fetchResult: Response,
-  fromHook?: UseFormReturn<any>,
-  schema?: ZodObject<any>
+  fromHook?: Pick<UseFormReturn<any>, "setError">,
+  schema?: ZodObject<any>,
+  successToastMessage?: string,
+  toaster: boolean = true
 ) {
   try {
     const response = await fetchResult.json();
     if (fetchResult.ok) {
+      if (successToastMessage) {
+        toast.success(successToastMessage);
+      }
       return response;
     } else {
       const validationErrors = response.errors
@@ -35,28 +43,23 @@ export async function handleFetchResponseClient(
         : [];
 
       if (schema) {
-        if (fetchResult.ok) {
-          const response = await fetchResult.json();
-          return response;
-        } else {
-          const response = await fetchResult.json();
+        if (fetchResult.status === 422 && response.errors) {
+          Object.entries(response.errors).forEach(([field, messages]) => {
+            if (Array.isArray(messages) && messages.length > 0 && fromHook) {
+              fromHook.setError(field, {
+                type: "manual",
+                message: messages.join(", "), // join if multiple messages
+              });
+            }
+          });
 
-          if (fetchResult.status === 422 && response.errors) {
-            // Loop through all errors
-            Object.entries(response.errors).forEach(([field, messages]) => {
-              if (Array.isArray(messages) && messages.length > 0 && fromHook) {
-                fromHook.setError(field, {
-                  type: "manual",
-                  message: messages.join(", "), // join if multiple messages
-                });
-              }
-            });
-
-            throw new Error(response.message);
-          }
-
-          throw new Error(fetchResult.statusText);
+          throw new Error(response.message ?? fetchResult.statusText);
         }
+        throw new Error(response.message ?? fetchResult.statusText);
+      }
+
+      if (toaster && response) {
+        toast.error(toast.error(response.message));
       }
 
       return {
