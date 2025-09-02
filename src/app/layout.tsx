@@ -12,6 +12,7 @@ import NextUiProviders from "../components/providers/nextui-provider/NextuiProvi
 import RootModal from "../components/general components/modal/RootModal";
 import TestModal from "../components/test modal/TestModal";
 import { auth } from "@/auth_setup/next_auth";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: {
@@ -44,7 +45,7 @@ export default async function RootLayout({
       <body
         className={clsx(
           "min-h-screen text-foreground bg-background font-sans antialiased",
-          fontSans.variable,
+          fontSans.variable
         )}
       >
         <NextUiProviders
@@ -64,6 +65,7 @@ export default async function RootLayout({
             </footer>
           </div>
           <RootModal />
+          <Toaster dir="rtl" richColors position="top-center" expand />
         </NextUiProviders>
       </body>
     </html>

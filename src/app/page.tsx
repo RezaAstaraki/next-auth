@@ -14,6 +14,7 @@ import { Input } from "@heroui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ServerSignOut } from "@/auth_setup/next_auth";
 import { useSession } from "next-auth/react";
+import OtpLogin from "../components/otp_login/OtpLogin";
 
 export default function Home() {
   //  const query = useQuery({ queryKey: ["ss"], queryFn: test });
@@ -64,6 +65,9 @@ export default function Home() {
         get session
       </Button>
       {/* <pre>{JSON.stringify({ session, status }, null, 2)}</pre> */}
+
+
+      <OtpLogin stepRender="MobileStep"/>
     </section>
   );
 }

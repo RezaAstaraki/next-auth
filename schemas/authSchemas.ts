@@ -11,3 +11,15 @@ export const otpSchema = z.object({
   otpCode: z.string().min(4, "should be 4  digit"),
 });
 export type OtpSchemaType = z.infer<typeof otpSchema>;
+
+export const sendMobileSchema = z.object({
+  mobile: z
+    .string({ message: "شماره موبایل نمی‌تواند خالی باشد" })
+    .min(1, { message: "شماره موبایل نمی‌تواند خالی باشد" })
+    // .regex(/^09\d{9}$/, {
+    //   message: "شماره موبایل باید یک شماره معتبر باشد. مانند 09121234567 ",
+    // }),
+});
+export type MobileSchemaType = z.infer<typeof sendMobileSchema>;
+
+

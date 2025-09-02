@@ -4,8 +4,6 @@ import { twMerge } from "tailwind-merge";
 import { FailResponse } from "./types";
 
 import { revalidateTag } from "next/cache";
-import { ADMIN_CLIENT_BASE_URL, HOST_DOMAIN_FILES_URL } from "./environment";
-import { adminAuthorizedHeader } from "./serverUtils";
 import { errorResponse } from "./constants/constants";
 
 export function cn(...inputs: ClassValue[]) {
@@ -43,14 +41,6 @@ export function cn(...inputs: ClassValue[]) {
 //     return response;
 //   }
 // };
-
-export const clientUrlMaker = (endPoint: string) => {
-  const baseUrl = ADMIN_CLIENT_BASE_URL;
-  if (!baseUrl) {
-    throw new Error("API URL is not defined");
-  }
-  return baseUrl;
-};
 
 export function formDataMaker(
   obj: Record<string, any>,
@@ -91,13 +81,9 @@ export function formDataMaker(
   return formData;
 }
 
-export function getPictureSrc(path: string) {
-  return HOST_DOMAIN_FILES_URL + path;
-}
-
 export async function fetchWithRetry(
   url: string,
-  headers: HeadersInit = adminAuthorizedHeader(),
+  headers: HeadersInit ,
   options: RequestInit = {},
   cacheTime = 0,
   revalidateTags?: string[] | string,
