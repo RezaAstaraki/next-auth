@@ -5,6 +5,8 @@ import {
   clientUrlMaker,
   handleFetchResponseClient,
 } from "@/src/lib/clientUtils";
+import { setOtp, setStep } from "@/src/redux/features/loginotp/loginOtpSlice";
+import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,21 +14,18 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
 type StepType = "MobileStep" | "SendOtpStep";
-
 type Props = {
   stepRender: StepType;
   uiStepOne?: React.ReactNode;
   uiStepTwo?: React.ReactNode;
 };
-
 export default function OtpLogin({
   stepRender,
   uiStepOne = MobileStep(),
   uiStepTwo = SendOtpStep(),
 }: Props) {
-  const [step, setStep] = useState<StepType>(stepRender);
+  const step = useAppSelector(state=>state.opt.step)
   return (
     <>
       {step === "MobileStep" && uiStepOne}
@@ -40,7 +39,7 @@ const MobileStep = () => {
     formState: { errors },
     ...mobileForm
   } = useForm<MobileSchemaType>({ resolver: zodResolver(sendMobileSchema) });
-
+  
   const sendMobile = async (data: MobileSchemaType) => {
     const res = await fetch(clientUrlMaker("/auth/request-otp"), {
       method: "POST",
@@ -50,18 +49,18 @@ const MobileStep = () => {
       body: JSON.stringify(data),
     });
     console.log("res", res);
-
     const response = await handleFetchResponseClient(
       res,
       mobileForm,
-      sendMobileSchema,
+      sendMobileSchema
     );
-
-    console.log(response)
+    return response;
   };
-
+  
+  const dispatch = useAppDispatch()
   const submitMobile = (data: MobileSchemaType) => {
     sendMobileMutate.mutate(data);
+
   };
 
   const sendMobileMutate = useMutation({
@@ -69,7 +68,11 @@ const MobileStep = () => {
     // retry: 3,
     onSuccess: (data) => {
       toast.success("کد به شما ارسال شد");
-      console.log(data);
+      console.log("data onss", data);
+      dispatch(setOtp({step:'SendOtpStep',expires_at:data.expires_at,request_id:data.request_id}))
+
+      
+      
     },
     onError: (ee) => {
       console.log("eeee", ee);
@@ -79,6 +82,7 @@ const MobileStep = () => {
 
   return (
     <form onSubmit={mobileForm.handleSubmit(submitMobile)}>
+        {errors.root?.message && <p>{errors.root.message}</p>}
       <Input
         {...mobileForm.register("mobile")}
         type="text"
@@ -88,13 +92,14 @@ const MobileStep = () => {
       <Button isLoading={sendMobileMutate.isPending} type="submit">
         ارسال کد
       </Button>
+
     </form>
   );
 };
 
 const SendOtpStep = () => {
   const otpForm = useForm();
-  const submitOtpFrom = (data:any) => {
+  const submitOtpFrom = (data: any) => {
     console.log(data);
   };
   return (

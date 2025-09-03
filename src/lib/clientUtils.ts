@@ -42,7 +42,7 @@ export async function handleFetchResponseClient(
           )
         : [];
 
-      if (schema) {
+      if (fromHook) {
         if (fetchResult.status === 422 && response.errors) {
           Object.entries(response.errors).forEach(([field, messages]) => {
             if (Array.isArray(messages) && messages.length > 0 && fromHook) {
@@ -52,9 +52,16 @@ export async function handleFetchResponseClient(
               });
             }
           });
-
+          fromHook.setError("root", {
+            type: "manual",
+            message: response.message ?? fetchResult.statusText, // join if multiple messages
+          });
           throw new Error(response.message ?? fetchResult.statusText);
         }
+        fromHook.setError("root", {
+          type: "manual",
+          message: response.message ?? fetchResult.statusText, // join if multiple messages
+        });
         throw new Error(response.message ?? fetchResult.statusText);
       }
 
