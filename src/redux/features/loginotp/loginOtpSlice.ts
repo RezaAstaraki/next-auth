@@ -4,22 +4,43 @@ type OtpSliceType = {
   request_id: string;
   expires_at: string;
   step: "MobileStep" | "SendOtpStep";
-  mobile:string
+  mobile: string;
+};
+
+const resetState: OtpSliceType = {
+  request_id: "",
+  expires_at: "",
+  step: "MobileStep",
+  mobile: "",
 };
 
 // ✅ Load from localStorage if exists
 const loadOtpFromStorage = (): OtpSliceType => {
-  if (typeof window === "undefined") return { request_id: "0", expires_at: "0", step: "MobileStep" ,mobile:""};
+  if (typeof window === "undefined") return resetState;
 
   const stored = localStorage.getItem("otp");
   if (stored) {
     try {
-      return JSON.parse(stored) as OtpSliceType;
+      const otpState = JSON.parse(stored) as OtpSliceType;
+
+      const isExpired =
+        !otpState.expires_at ||
+        new Date(otpState.expires_at).getTime() <= Date.now();
+
+      const isInvalid = !otpState.mobile || !otpState.request_id;
+
+      if (isExpired || isInvalid) {
+        localStorage.setItem("otp", JSON.stringify(resetState));
+        return resetState;
+      }
+
+      return otpState;
     } catch {
-      return { request_id: "0", expires_at: "0", step: "MobileStep",mobile:"" };
+      return resetState;
     }
   }
-  return { request_id: "0", expires_at: "0", step: "MobileStep" ,mobile:""};
+
+  return resetState;
 };
 
 const initialState: OtpSliceType = loadOtpFromStorage();
@@ -28,10 +49,11 @@ const otpSlice = createSlice({
   name: "otp",
   initialState,
   reducers: {
-    setStep: (state, action: PayloadAction<{ step: "MobileStep" | "SendOtpStep"}>) => {
+    setStep: (
+      state,
+      action: PayloadAction<{ step: "MobileStep" | "SendOtpStep" }>
+    ) => {
       state.step = action.payload.step;
-
-      // ✅ Save back to localStorage
       if (typeof window !== "undefined") {
         localStorage.setItem("otp", JSON.stringify(state));
       }
@@ -40,13 +62,13 @@ const otpSlice = createSlice({
       state.request_id = action.payload.request_id;
       state.expires_at = action.payload.expires_at;
       state.step = action.payload.step;
+      state.mobile = action.payload.mobile;
 
       if (typeof window !== "undefined") {
         localStorage.setItem("otp", JSON.stringify(state));
       }
     },
     resetOtp: () => {
-      const resetState: OtpSliceType = { request_id: "0", expires_at: "0", step: "MobileStep",mobile:"" };
       if (typeof window !== "undefined") {
         localStorage.removeItem("otp");
       }

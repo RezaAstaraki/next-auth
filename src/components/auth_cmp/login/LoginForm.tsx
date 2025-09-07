@@ -8,7 +8,7 @@ import { Button } from "@heroui/button";
 import Clo from "../../general components/client logger/Clo";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getCaptcha, sendSms } from "@/actions/authActions";
-import { useCaptcha } from "@/src/hooks/reactQueryHooks";
+import { useCaptcha } from "@/src/hooks/useFormMutation";
 import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 

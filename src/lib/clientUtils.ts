@@ -22,7 +22,6 @@ type MinimalForm<T> = Pick<UseFormReturn<any>, "setError">;
 export async function handleFetchResponseClient(
   fetchResult: Response,
   fromHook?: Pick<UseFormReturn<any>, "setError">,
-  schema?: ZodObject<any>,
   successToastMessage?: string,
   toaster: boolean = true
 ) {

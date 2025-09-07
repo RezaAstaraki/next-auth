@@ -8,7 +8,7 @@ import optSlice from "./features/loginotp/loginOtpSlice"
 export const store = configureStore({
     reducer: {
         modal:modalReducer,
-        opt:optSlice
+        otp:optSlice
     
     },
 });
