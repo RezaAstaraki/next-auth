@@ -1,67 +1,116 @@
 import { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
-import NextAuth, { DefaultSession } from "next-auth";
+import { DefaultSession } from "next-auth";
+import { User } from "@/schemas/authSchemas";
+import { VerifyOtpResponseType } from "@/actions/types/BackendApiResponseTypes";
 
 declare module "next-auth" {
   interface Session {
-    user: {
-      /** Your custom field */
-      address?: string;
-      cunstom?: string;
-      myProperty?: string;
-    } & DefaultSession["user"]; // Keep default user properties
-  }
-
-  interface User {
-    myProperty?: string;
+    user: User & DefaultSession["user"]; // Keep default user properties
   }
 }
+
+type OtpCredentials = {
+  user: {
+    mobile: string | null;
+    id: number;
+    first_name: string | null;
+    last_name: string | null;
+    email: string | null;
+    national_code: string | null;
+    birthday: string;
+    gender:
+      | {
+          id: 1;
+          title: "male";
+        }
+      | {
+          id: 2;
+          title: "female";
+        };
+    postal_code: string | null;
+    address: string | null;
+    iban: string | null;
+    verified_at: string | null;
+  };
+  action: string;
+  token: string;
+  token_type: string;
+};
 
 export const authConfig = {
   session: { strategy: "jwt" },
   providers: [
     Credentials({
       id: "otp",
-      credentials: {
-        otpCode: { label: "OTP CODE " },
-        // password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        console.log("credentials in auth config", credentials);
-        // return {user:credentials.username}in
-        if (credentials.otpCode === "1234") {
-          return {
-            id: "1",
-            name: "test",
-            email: "dd",
-            myProperty: "custom in user",
-          };
-        }
+      // credentials: {
+      //   user:User,
+      //   token:string,
+      //   action :string,
+      //   token_type:string
 
-        return null;
+      // },
+
+      async authorize(credentials: any) {
+        if (!credentials) return null;
+
+        const user = JSON.parse(credentials.user);
+
+        console.log("user in authorize", user);
+
+        // fix roles
+        let roles: any[] = [];
+        try {
+          roles = JSON.parse(String(credentials.roles ?? "[]"));
+        } catch {
+          roles = [];
+        }
+        console.log("credentials in authorize", credentials);
+
+        // return { ...user, roles ,id:user.id };
+        return { id: String(user.id), ...user, token: credentials.token };
       },
     }),
   ],
   callbacks: {
     jwt: async ({ token, user, session }) => {
-      token["cunstom"] = "cccc";
-      // console.log("token in jwt call back", JSON.stringify(token, null, 2));
       if (user) {
-        // console.log("------------------", ">>>>>>>>>>>>");
-        token["myProperty"] = user.myProperty;
+        //   token['user']=user
+        // token['id'] = user.id;
+        token["user"] = user;
       }
-      token["justinjwt"] = "just in jwt ";
+
+      console.log("------------------jwt call back ---------------------");
+      console.log("token in JWT call back", token);
+      console.log("user in JWT call back", user);
+      console.log("session in JWT call back", session);
+      console.log("------------------jwt call back End ---------------------");
+
       return token;
     },
-    session: async ({ session, token }) => {
-      if (token?.cunstom) {
-        session.user["cunstom"] = token.cunstom as string;
+    session: async ({ session, token, user }) => {
+      if (session.user) {
+        // session.user["id"] = token.sub as string;
+        // session.user["first_name"] = token.user.first_name as string;
+        // session.user["last_name"] = token.user.last_name as string;
+        // session.user["mobile"] = token.user.mobile as string;
+        // session.user["email"] = token.user.email as string;
+        // session.user["national_code"] = token.user.national_code as string;
+        // session.user["gender"] = token.user.gender;
+        // session.user["roles"] = JSON.parse(token.user.roles) as string;
+        // session.user["verified_at"] = token.user.verified_at;
+        // session.user["created_at"] = token.user.created_at as string;
+        // session.user["callbackUrl"] = token.user.callbackUrl as string;
       }
-      if (token?.myProperty) {
-        session.user.myProperty = token.myProperty as string;
-      }
-      console.log("session in call back", JSON.stringify(session, null, 2));
+
+      console.log("------------------SESSION call back ---------------------");
+      console.log("token in SESSION call back", token);
+      console.log("user in SESSION call back", user);
+      console.log("session in SESSION call back", session);
+      console.log(
+        "------------------SESSION call back End ---------------------"
+      );
 
       return session;
     },

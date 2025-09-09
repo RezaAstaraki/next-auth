@@ -1,9 +1,7 @@
 "use client";
 import {
-  getTokenAction,
-  signInOtp,
+  getDecodedToken,
   signoutAction,
-  test,
 } from "@/actions/authActions";
 import { useQuery } from "@tanstack/react-query";
 import { otpSchema, type OtpSchemaType } from "@/schemas/authSchemas";
@@ -15,39 +13,28 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ServerSignOut } from "@/auth_setup/next_auth";
 import { useSession } from "next-auth/react";
 import OtpLogin from "../components/otp_login/OtpLogin";
+import { useFormMutation } from "../hooks/useFormMutation";
+import { profileShow } from "@/actions/user/user-actions";
+import { useEffect } from "react";
 
 export default function Home() {
   //  const query = useQuery({ queryKey: ["ss"], queryFn: test });
 
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm<OtpSchemaType>({
-    resolver: zodResolver(otpSchema),
-  });
 
-  const onSubmit = async (data: OtpSchemaType) => {
-    console.log(data);
-    await signInOtp(data);
-  };
+  const showProfileQuery = useQuery({queryFn:profileShow,queryKey:['showProfile'],enabled:false})
 
-  // const { data: session, status, update } = useSession();
+  useEffect(()=>{
+    const ss = showProfileQuery.data?.ok ? showProfileQuery.data.body :showProfileQuery.data?.message
+
+    console.log( 'data',ss)
+  },[showProfileQuery.isFetching])
+
+  
 
   return (
     <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
       {/*   <pre>{JSON.stringify(query, null, 4)}</pre> */}
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Input
-          {...register("otpCode")}
-          type="text"
-          errorMessage={errors.otpCode?.message}
-          isInvalid={!!errors.otpCode}
-        />
-
-        <Button type="submit">login</Button>
-      </form>
       <Button
         onPress={async () => {
           await signoutAction();
@@ -55,15 +42,25 @@ export default function Home() {
       >
         logout
       </Button>
-
       <Button
         onPress={async () => {
-          const res = await getTokenAction();
+          const res = await getDecodedToken();
           console.log(res);
         }}
       >
         get session
       </Button>
+      {/* <pre>{JSON.stringify(showProfileQuery,null,2)}</pre> */}
+      <Button
+      isLoading={showProfileQuery.isFetching}
+        onPress={()=>{
+          showProfileQuery.refetch()
+        }}
+      >
+        get profile
+      </Button>
+
+
       {/* <pre>{JSON.stringify({ session, status }, null, 2)}</pre> */}
 
 

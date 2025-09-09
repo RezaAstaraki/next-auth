@@ -5,22 +5,20 @@ import { decode, getToken } from "next-auth/jwt";
 import {
   AuthWithOTPRequestSchema,
   AuthWithOTPRequestSchemaType,
-  LoginSchema,
-  LoginSchemaType,
-  OtpSchemaType,
 } from "@/schemas/authSchemas";
-import { ApiResponse } from "./types";
-import { ServerSignIn, ServerSignOut } from "@/auth_setup/next_auth";
+
+import { auth, ServerSignIn, ServerSignOut } from "@/auth_setup/next_auth";
 import { cookies } from "next/headers";
 import { VerifyOtpResponseType } from "./types/BackendApiResponseTypes";
-import { fetchWithRetry } from "@/src/lib/utils";
+import { formDataMaker } from "@/src/lib/utils";
 import { errorResponse } from "@/src/lib/constants/constants";
 import { fetchWithRetryServer } from "@/src/lib/serverUtils";
+import { User } from "@/schemas/third-party-api-schemas";
 
-type CaptchaType = {
-  img: string;
-  cpCode: string;
-};
+// type CaptchaType = {
+//   img: string;
+//   cpCode: string;
+// };
 
 // export async function getCaptcha(): Promise<ApiResponse<CaptchaType>> {
 //   try {
@@ -85,12 +83,7 @@ type CaptchaType = {
 //   }
 // }
 
-export const test = async () => {
-  return { hello: "world" };
-  // throw new Error("test error");
-};
-
-export async function signInOtp(
+export async function signInOtpAction(
   data: AuthWithOTPRequestSchemaType
 ): Promise<any> {
   try {
@@ -101,47 +94,75 @@ export async function signInOtp(
         ok: false,
         message: "مشکل در اطلاعات ورودی",
         errors: parsed.error.flatten().fieldErrors,
-        status:422
+        status: 422,
       };
     }
-    const res = await fetchWithRetryServer<VerifyOtpResponseType>("/auth/verify-otp", {
-      options: {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(parsed.data),
-      },
-      retries: 3,
-      delayTime: 500,
-    });
+    const res = await fetchWithRetryServer<VerifyOtpResponseType>(
+      "/auth/verify-otp",
+      {
+        options: {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(parsed.data),
+        },
+        retries: 3,
+        delayTime: 500,
+      }
+    );
 
-    return res
+    if (res.ok) {
+      const credentials = {
+        user: JSON.stringify(res.body.user),
+        action: res.body.action,
+        token: res.body.token,
+        token_type: res.body.token_type,
+      };
+
+      await ServerSignIn("otp", credentials);
+    }
+
+    return res;
+
+    // res
 
     // console.log('res in server action',res)
 
-
     // const result = await ServerSignIn("otp", parsed.data);
-
-   
   } catch (e) {
+    throw new Error(errorResponse.message);
     console.error("signInOtp error:", e);
-    return errorResponse
+    return errorResponse;
   }
 }
 export const signoutAction = async () => {
-  await ServerSignOut({ redirect: true });
+  await ServerSignOut({ redirect: true, redirectTo: "/dashboard" });
 };
 
-export const getTokenAction = async () => {
-  const to = (await cookies()).get("authjs.session-token")?.value;
+type JWTType = {
+  user: User & { token: string };
+  email: string | null;
+  exp: number;
+  iat: number;
+  jti: string;
+  sub: string;
+};
 
-  if (!to) return null;
+export const getDecodedToken = async (
+  needUpdate: boolean = false
+): Promise<JWTType | null> => {
+  const rawToken = (await cookies()).get("authjs.session-token")?.value;
+  if (!rawToken) return null;
+  if (needUpdate)await auth();
 
-  const ss = await decode({
-    token: to,
+  const decodedToken: any = await decode({
+    token: rawToken,
     secret: process.env.AUTH_SECRET || "",
     salt: "authjs.session-token",
   });
-  console.log("ss", JSON.stringify(ss, null, 2));
+  return decodedToken as JWTType;
+};
 
-  return ss;
+export const getTokenAccess = async () => {
+  const jwt = await getDecodedToken();
+  return jwt?.user?.token;
 };

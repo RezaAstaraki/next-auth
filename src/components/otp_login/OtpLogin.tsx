@@ -1,6 +1,6 @@
 "use client";
 
-import { signInOtp } from "@/actions/authActions";
+
 import {
   MobileSchemaType,
   OtpSchemaType,
@@ -26,6 +26,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useEffect,} from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { signInOtpAction } from "@/actions/authActions";
 type StepType = "MobileStep" | "SendOtpStep";
 type Props = {
   stepRender: StepType;
@@ -162,7 +163,7 @@ const SendOtpStep = () => {
   //   },
   // });
 
-  const mutateOtp = useFormMutation({mutationFn:signInOtp,mutationKey:['signInOtp']},{hookForm:otpForm,toastContent:'all'})
+  const mutateOtp = useFormMutation({mutationFn:signInOtpAction,mutationKey:['signInOtp']},{hookForm:otpForm,toastContent:'all'})
   // const mutateOtp = useMutation({mutationFn:signInOtp,mutationKey:['signInOtp']})
 
 

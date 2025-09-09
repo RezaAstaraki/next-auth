@@ -1,9 +1,10 @@
 "server only";
 
+import { ApiResponse } from "@/actions/types";
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
-const cookieName = process.env.COOKIENAME as string;
+const cookieName = process.env.COOKIE_NAME as string;
 
 type FetchOptions = {
   options?: RequestInit;
@@ -48,7 +49,7 @@ export async function fetchWithRetryServer<T>(
     delayTime = 500,
     retries = 3,
   }: FetchOptions = {}
-): Promise<T | ApiError> {
+): Promise<ApiResponse<T>> {
   const internalHeader: HeadersInit =
     headers ?? (await adminAuthorizedHeader());
 
@@ -68,7 +69,6 @@ export async function fetchWithRetryServer<T>(
       };
 
       const res = await fetch(ServerUrlMaker(url), fetchOptions);
-
       return await serverHandleResponse<T>(res, revalidateTags);
     } catch (e) {
       console.warn(`Retrying... (${i + 1}/${retries})`, e);
@@ -84,6 +84,7 @@ export async function fetchWithRetryServer<T>(
       }
     }
   }
+
   return {
     ok: false,
     message: "Unexpected error",
@@ -94,36 +95,39 @@ export async function fetchWithRetryServer<T>(
 export async function serverHandleResponse<T>(
   res: Response,
   revalidateTags?: string | string[]
-): Promise<T | ApiError> {
+): Promise<ApiResponse<T>> {
   try {
     const data = await res.json();
 
     if (!res.ok) {
-      console.log('ssssssssssssssssssssssssssssssssssss')
-      const error: ApiError = {
+      return {
         ok: false,
         message: data.message ?? "Request failed",
         errors: data.errors ?? undefined,
         status: res.status ?? 500,
       };
-      return error;
-    } else {
-      if (revalidateTags) {
-        const tags = Array.isArray(revalidateTags)
-          ? revalidateTags
-          : [revalidateTags];
-        tags.forEach((tag) => {
-          revalidateTag(tag); // assume this function exists in your environment
-        });
-      }
-
-      return data as T;
     }
+
+    if (revalidateTags) {
+      const tags = Array.isArray(revalidateTags)
+        ? revalidateTags
+        : [revalidateTags];
+      tags.forEach((tag) => {
+        revalidateTag(tag); // assume this exists
+      });
+    }
+
+    return {
+      ok: true,
+      status: res.status,
+      body: data as T,
+    };
   } catch (e) {
     return {
       ok: false,
       message: e instanceof Error ? e.message : "Failed to parse response",
-      status:500
+      status: 500,
     };
   }
 }
+
