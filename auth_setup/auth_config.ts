@@ -42,6 +42,7 @@ type OtpCredentials = {
 export const authConfig = {
   session: { strategy: "jwt" },
   providers: [
+    
     Credentials({
       id: "otp",
       // credentials: {
@@ -72,6 +73,8 @@ export const authConfig = {
         return { id: String(user.id), ...user, token: credentials.token };
       },
     }),
+    
+
   ],
   callbacks: {
     jwt: async ({ token, user, session }) => {
@@ -112,7 +115,9 @@ export const authConfig = {
         "------------------SESSION call back End ---------------------"
       );
 
+
       return session;
     },
+
   },
 } satisfies NextAuthConfig;

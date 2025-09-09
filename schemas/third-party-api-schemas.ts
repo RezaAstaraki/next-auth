@@ -20,3 +20,26 @@ export const UserSchema = z.object({
 
 export type User = z.infer<typeof UserSchema>;
 export type ListRoleResource = z.infer<typeof ListRoleResourceSchema>;
+
+export const updateProfileSchema = z.object({
+  first_name: z
+    .string()
+    .min(1, "نام نمیتواند خالی باشد")
+    .max(255, "حداکثر طول 255 کاراکتر است"),
+
+  last_name: z
+    .string()
+    .min(1, "نام خانوادگی نمیتواند خالی باشد")
+    .max(255, "حداکثر طول 255 کاراکتر است"),
+
+  email: z
+    .string()
+    .email("ایمیل معتبر نیست")
+    .max(255, "حداکثر طول 255 کاراکتر است")
+    .nullable(),
+
+  national_code: z.string().max(255, "حداکثر طول 255 کاراکتر است").nullable(),
+
+  postal_code: z.string().max(255, "حداکثر طول 255 کاراکتر است").nullable(),
+});
+export type UpdateProfileSchemaType =z.infer<typeof updateProfileSchema>

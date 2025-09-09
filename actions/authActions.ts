@@ -135,7 +135,7 @@ export async function signInOtpAction(
   }
 }
 export const signoutAction = async () => {
-  await ServerSignOut({ redirect: true, redirectTo: "/dashboard" });
+  await ServerSignOut({ redirect: true });
 };
 
 type JWTType = {

@@ -5,6 +5,7 @@ import { FailResponse } from "./types";
 
 import { revalidateTag } from "next/cache";
 import { errorResponse } from "./constants/constants";
+import { ZodSchema } from "zod/v3";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -41,6 +42,25 @@ export function cn(...inputs: ClassValue[]) {
 //     return response;
 //   }
 // };
+
+
+export function parseData(data:any,schema:ZodSchema){
+
+  const parsedData = shecma.safeParse(data);
+    if (!parsedData.success) {
+      const { fieldErrors, formErrors } = parsedData.error.flatten();
+  
+      return {
+        ok: false,
+        message:'خطا در مقادیر ارسالی',
+        status: 422,
+         errors: {
+          ...fieldErrors,
+          ...(formErrors.length ? { _form: formErrors } : {}),
+        },
+      };
+    }
+}
 
 export function formDataMaker(
   obj: Record<string, any>,
