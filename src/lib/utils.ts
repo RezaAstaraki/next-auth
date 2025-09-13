@@ -1,6 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { FailResponse } from "./types";
 
 import { revalidateTag } from "next/cache";
 import { errorResponse } from "./constants/constants";
@@ -12,23 +11,12 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function parseData<T extends ZodSchema>(
-  data: unknown,
+export function dataParser<T extends ZodSchema>(
+  data: any,
   schema: T
 ): ApiError | z.infer<T> {
   try {
     const parsedData = schema.safeParse(JSON.parse(data));
-    // const parsedData = schema.safeParse(data);
-    // const parsedData = schema.safeParse({
-    //   first_name: "رضا",
-    //   last_name: "astaraki",
-    //   email: "",
-    //   national_code: "",
-    //   postal_code: "",
-    // });
-
-    console.log('parsed data in pardwe',parsedData)
-
     if (!parsedData.success) {
       const { fieldErrors, formErrors } = parsedData.error.flatten();
 
@@ -42,9 +30,7 @@ export function parseData<T extends ZodSchema>(
         },
       };
     }
-
-    // ✅ Return parsed data if success
-    return parsedData.data;
+    return parsedData;
   } catch {
     return {
       ok: false,
@@ -72,14 +58,11 @@ export function formDataMaker(
       !Array.isArray(value) &&
       value !== null
     ) {
-      // Recursively handle nested objects
       formDataMaker(value, formData, formKey);
     } else if (Array.isArray(value)) {
-      // For arrays, append each item with its index
       value.forEach((item, index) => {
         const arrayKey = `${formKey}[${index}]`;
         if (typeof item === "object" && !Array.isArray(item)) {
-          // Recursively handle nested objects within arrays
           formDataMaker(item, formData, arrayKey);
         } else {
           formData.append(arrayKey, item);

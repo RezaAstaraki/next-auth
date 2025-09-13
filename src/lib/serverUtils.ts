@@ -4,7 +4,7 @@ import { ApiResponse } from "@/actions/types";
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { ZodSchema } from "zod";
-import { parseData } from "./utils";
+import { dataParser } from "./utils";
 
 const cookieName = process.env.COOKIE_NAME as string;
 
@@ -34,12 +34,12 @@ export const ServerUrlMaker = (endPoint: string) => {
   return `${baseUrl}${endPoint}`;
 };
 
-export type ApiError = {
-  ok: false;
-  message: string;
-  errors?: Record<string, string[]>;
-  status: number;
-};
+// export type ApiError = {
+//   ok: false;
+//   message: string;
+//   errors?: Record<string, string[]>;
+//   status: number;
+// };
 
 export async function fetchWithRetryServer<T>(
   url: string,
@@ -54,8 +54,8 @@ export async function fetchWithRetryServer<T>(
   schema?: ZodSchema
 ): Promise<ApiResponse<T>> {
   if (schema && options.body) {
-    const parsed = parseData(options?.body, schema as ZodSchema<any>);
-    if (parsed) {
+    const parsed = dataParser(options?.body, schema as ZodSchema<any>);
+    if (parsed && !parsed?.success) {
       return parsed;
     }
   }

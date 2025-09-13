@@ -182,9 +182,6 @@ const SendOtpStep = () => {
 
   const canResend = true;
 
-  useEffect(() => {
-    console.error(otpForm.formState.errors);
-  }, [otpForm.formState.errors]);
 
   return (
     <div className="flex flex-col gap-4">

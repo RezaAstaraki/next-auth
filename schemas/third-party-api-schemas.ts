@@ -38,8 +38,8 @@ export const updateProfileSchema = z.object({
     .max(255, "حداکثر طول 255 کاراکتر است")
     .nullable(),
 
-  national_code: z.string().max(255, "حداکثر طول 255 کاراکتر است"),
+  national_code: z.string().length(10, "تعداد ارقام کد ملی باید 10 رقم است"),
 
-  postal_code: z.string().max(255, "حداکثر طول 255 کاراکتر است").nullable(),
+  postal_code: z.string().length(10, "تعداد ارقام کد پستی باید 10 رقم است").or(z.literal("")).nullable(),
 });
 export type UpdateProfileSchemaType =z.infer<typeof updateProfileSchema>
