@@ -1,8 +1,8 @@
 export type SiteConfig = typeof siteConfig;
-import { name } from "@/package.json";
+import pkg from "@/package.json";
 
 export const siteConfig = {
-  name: name,
+  name: pkg.name,
   description: "Make beautiful websites regardless of your design experience.",
   navItems: [
     {

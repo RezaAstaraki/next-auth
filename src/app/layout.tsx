@@ -3,7 +3,7 @@ import { Metadata, Viewport } from "next";
 import { Link } from "@heroui/link";
 import clsx from "clsx";
 
-import { version, name } from "@/package.json";
+import pkg from "@/package.json";
 
 import { siteConfig } from "@/src/config/site";
 import { fontSans } from "@/src/config/fonts";
@@ -62,7 +62,7 @@ export default async function RootLayout({
               {children}
             </main>
             <footer className="w-full flex text-xs items-center justify-center py-3">
-              {name}-version-{version}
+              {pkg.name}-version-{pkg.version}
             </footer>
           </div>
           <RootModal />

@@ -3,7 +3,6 @@ import Credentials from "next-auth/providers/credentials";
 
 import { DefaultSession } from "next-auth";
 import { User } from "@/schemas/authSchemas";
-import { VerifyOtpResponseType } from "@/actions/types/BackendApiResponseTypes";
 
 declare module "next-auth" {
   interface Session {
