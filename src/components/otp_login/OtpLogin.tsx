@@ -88,7 +88,7 @@ const MobileStep = () => {
       );
     },
     onError: (ee) => {
-      console.log("eeee", ee);
+      console.error("eeee", ee);
       toast.error(ee.message ?? "خطا در ارسال کد");
     },
   });
@@ -150,7 +150,6 @@ const SendOtpStep = () => {
   //   mutationKey: ["otpLogin"],
 
   //   onSuccess: (data) => {
-  //     console.log(data);
   //     if(!data.ok){
   //   throw new Error (data.message)
   //  }
@@ -172,15 +171,7 @@ const SendOtpStep = () => {
     new Date(otpState.expires_at).getTime() <= Date.now();
 
   const submitOtpForm = async (data: OtpSchemaType) => {
-    console.log(data);
-
-
-
-console.log('sending',{...data,mobile:otpState.mobile,request_id:otpState.request_id})
-
    const res =await mutateOtp.mutateAsync({...data,mobile:otpState.mobile,request_id:otpState.request_id});
-   console.log(res,'ssssssssssssssssssssssssssssssss')
-   
   };
 
   const { time } = useCountDownTimer(otpState.expires_at);
@@ -192,13 +183,8 @@ console.log('sending',{...data,mobile:otpState.mobile,request_id:otpState.reques
   const canResend = true;
 
   useEffect(() => {
-    console.log(otpForm.formState.errors);
+    console.error(otpForm.formState.errors);
   }, [otpForm.formState.errors]);
-
-  //   useEffect(()=>{
-  //   console.log('getvalkues',otpForm.getValues(),('code' in otpForm.getValues()))
-   
-  // })
 
   return (
     <div className="flex flex-col gap-4">

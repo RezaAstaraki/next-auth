@@ -38,7 +38,7 @@ export const updateProfileSchema = z.object({
     .max(255, "حداکثر طول 255 کاراکتر است")
     .nullable(),
 
-  national_code: z.string().max(255, "حداکثر طول 255 کاراکتر است").nullable(),
+  national_code: z.string().max(255, "حداکثر طول 255 کاراکتر است"),
 
   postal_code: z.string().max(255, "حداکثر طول 255 کاراکتر است").nullable(),
 });

@@ -12,10 +12,22 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function parseData(data: any, schema: ZodSchema): ApiError | undefined {
+export function parseData<T extends ZodSchema>(
+  data: unknown,
+  schema: T
+): ApiError | z.infer<T> {
   try {
-    const d: z.infer<typeof data> = data;
-    const parsedData = schema.safeParse(d);
+    const parsedData = schema.safeParse(JSON.parse(data));
+    // const parsedData = schema.safeParse(data);
+    // const parsedData = schema.safeParse({
+    //   first_name: "رضا",
+    //   last_name: "astaraki",
+    //   email: "",
+    //   national_code: "",
+    //   postal_code: "",
+    // });
+
+    console.log('parsed data in pardwe',parsedData)
 
     if (!parsedData.success) {
       const { fieldErrors, formErrors } = parsedData.error.flatten();
@@ -30,6 +42,9 @@ export function parseData(data: any, schema: ZodSchema): ApiError | undefined {
         },
       };
     }
+
+    // ✅ Return parsed data if success
+    return parsedData.data;
   } catch {
     return {
       ok: false,

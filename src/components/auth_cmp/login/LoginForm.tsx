@@ -37,7 +37,6 @@ type Props = {};
 //     mutationKey: ["sendSMS"],
 
 //     onSuccess: (data) => {
-//       console.log("✅ SMS sent successfully:", data);
 //       setStep(2)
 //     },
 //     onError: (error) => {
@@ -52,13 +51,13 @@ type Props = {};
 
 //   useEffect(() => {
 
-//     console.log(data)
+
 
 //     if (data?.value?.cpCode) setValue("cpCode", data?.value?.cpCode);
 //   }, [others.isSuccess,others.isFetching]);
 
 //   const onsubmit = (data: LoginSchemaType) => {
-//     console.log(data);
+
 //     sendSMS.mutate(data);
 //   };
 

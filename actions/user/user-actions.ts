@@ -23,10 +23,10 @@ export async function profileUpdatePromise(
   data: UpdateProfileSchemaType
 ): Promise<ApiResponse<User>> {
   // const parsedData = updateProfileSchema.safeParse(data);
-  const parsedData = parseData(data, updateProfileSchema);
-  if(parsedData){
-    return parsedData;
-  }
+  // const parsedData = parseData(data, updateProfileSchema);
+  // if(parsedData){
+  //   return parsedData;
+  // }
   // if (!parsedData.success) {
   //   const { fieldErrors, formErrors } = parsedData.error.flatten();
 
@@ -41,15 +41,19 @@ export async function profileUpdatePromise(
   //   };
   // }
 
-  const res = await fetchWithRetryServer<User>("/profile", {
-    options: {
-      method: "POST",
-      body: JSON.stringify(data),
+  const res = await fetchWithRetryServer<User>(
+    "/profile",
+    {
+      options: {
+        method: "POST",
+        body: JSON.stringify(data),
+      },
+      headers: {
+        Authorization: `Bearer ${await getTokenAccess()}`,
+      },
     },
-    headers: {
-      Authorization: `Bearer ${await getTokenAccess()}`,
-    },
-  });
+    updateProfileSchema
+  );
 
   return res;
 }

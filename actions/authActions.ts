@@ -123,10 +123,6 @@ export async function signInOtpAction(
 
     return res;
 
-    // res
-
-    // console.log('res in server action',res)
-
     // const result = await ServerSignIn("otp", parsed.data);
   } catch (e) {
     throw new Error(errorResponse.message);
