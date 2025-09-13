@@ -3,7 +3,7 @@
 import { ApiResponse } from "@/actions/types";
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
-import { ZodSchema } from "zod/v3";
+import { ZodSchema } from "zod";
 import { parseData } from "./utils";
 
 const cookieName = process.env.COOKIE_NAME as string;
@@ -53,12 +53,12 @@ export async function fetchWithRetryServer<T>(
   }: FetchOptions = {},
   schema?: ZodSchema
 ): Promise<ApiResponse<T>> {
-  // if (schema && options.body) {
-  //   const parsed = parseData(options?.body, schema);
-  //   if (parsed) {
-  //     return parsed;
-  //   }
-  // }
+  if (schema && options.body) {
+    const parsed = parseData(options?.body, schema as ZodSchema<any>);
+    if (parsed) {
+      return parsed;
+    }
+  }
   const internalHeader: HeadersInit =
     headers ?? (await adminAuthorizedHeader());
 

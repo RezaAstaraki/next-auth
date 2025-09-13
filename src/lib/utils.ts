@@ -12,38 +12,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// export const clientHandleResponse = ({
-//   res,
-//   successToastMessage,
-//   toaster = true,
-// }: {
-//   res: any;
-//   successToastMessage?: string;
-//   toaster?: boolean;
-// }) => {
-//   if (!res.ok) {
-//     const response: FailResponse = res.body;
-//     console.log(res);
-//     if (response.Errors) {
-//       if (toaster && response) {
-//         Object.values(response.Errors).forEach((errorMessages) => {
-//           errorMessages.forEach((error) => toast.error(error));
-//         });
-//       }
-//     } else {
-//       if (toaster && response) {
-//         toast.error(response.message);
-//       }
-//     }
-//   } else {
-//     const response = res.body;
-//     if (successToastMessage) {
-//       toast.success(successToastMessage);
-//     }
-//     return response;
-//   }
-// };
-
 export function parseData(data: any, schema: ZodSchema): ApiError | undefined {
   try {
     const d: z.infer<typeof data> = data;
