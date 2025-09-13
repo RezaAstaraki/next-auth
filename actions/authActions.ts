@@ -87,23 +87,23 @@ export async function signInOtpAction(
   data: AuthWithOTPRequestSchemaType
 ): Promise<any> {
   try {
-    const parsed = AuthWithOTPRequestSchema.safeParse(data);
+   
 
-    if (!parsed.success) {
-      return {
-        ok: false,
-        message: "مشکل در اطلاعات ورودی",
-        errors: parsed.error.flatten().fieldErrors,
-        status: 422,
-      };
-    }
+    // if (!parsed.success) {
+    //   return {
+    //     ok: false,
+    //     message: "مشکل در اطلاعات ورودی",
+    //     errors: parsed.error.flatten().fieldErrors,
+    //     status: 422,
+    //   };
+    // }
     const res = await fetchWithRetryServer<VerifyOtpResponseType>(
       "/auth/verify-otp",
       {
         options: {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(parsed.data),
+          body: JSON.stringify(data),
         },
         retries: 3,
         delayTime: 500,

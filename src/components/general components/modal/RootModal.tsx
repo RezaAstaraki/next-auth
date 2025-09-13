@@ -11,7 +11,7 @@ import {
   useDraggable,
 } from "@heroui/react";
 import { useEffect, useRef } from "react";
-import LoginForm from "../../auth_cmp/login/LoginForm";
+// import LoginForm from "../../auth_cmp/login/LoginForm";
 
 type Props = {};
 
@@ -66,7 +66,10 @@ export default function RootModal({}: Props) {
               {modalTitle && modalTitle}
             </ModalHeader>
           )}
-          <ModalBody>{type === "ss" && <LoginForm />}</ModalBody>
+          <ModalBody>
+            {/* {type === "ss" && <LoginForm />} */}
+            
+            </ModalBody>
         </ModalContent>
       </Modal>
     </>

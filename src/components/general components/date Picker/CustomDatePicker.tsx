@@ -17,11 +17,12 @@ import DatePicker, { DatePickerRef } from 'react-multi-date-picker';
 // import arabic_ar from "react-date-object/locales/arabic_ar"
 // import arabic_ar from "react-date-object/locales/arabic_ar"
 // import arabic_ar from "react-date-object/locales/arabic_ar"
-import { cn } from '@/lib/utils';
+
 import { XIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import TimePicker from 'react-multi-date-picker/plugins/time_picker';
 import './PersianDate.css';
+import { cn } from '@/src/lib/utils';
 
 type LocaleType = 'fa' | 'fa-IR' | 'fa-EN' | 'pr' | 'persian' | 'iran' | 'fa-AR' | 'fa-hi' | 'en';
 

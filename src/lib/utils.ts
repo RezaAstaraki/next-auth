@@ -1,11 +1,12 @@
 import { clsx, type ClassValue } from "clsx";
-import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 import { FailResponse } from "./types";
 
 import { revalidateTag } from "next/cache";
 import { errorResponse } from "./constants/constants";
-import { ZodSchema } from "zod/v3";
+import { ZodSchema } from "zod";
+import { ApiError } from "@/actions/types";
+import * as z from "zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -43,23 +44,31 @@ export function cn(...inputs: ClassValue[]) {
 //   }
 // };
 
+export function parseData(data: any, schema: ZodSchema): ApiError | undefined {
+  try {
+    const d: z.infer<typeof data> = data;
+    const parsedData = schema.safeParse(d);
 
-export function parseData(data:any,schema:ZodSchema){
-
-  const parsedData = shecma.safeParse(data);
     if (!parsedData.success) {
       const { fieldErrors, formErrors } = parsedData.error.flatten();
-  
+
       return {
         ok: false,
-        message:'خطا در مقادیر ارسالی',
+        message: "خطا در مقادیر ارسالی",
         status: 422,
-         errors: {
+        errors: {
           ...fieldErrors,
           ...(formErrors.length ? { _form: formErrors } : {}),
         },
       };
     }
+  } catch {
+    return {
+      ok: false,
+      message: "خطا در مقادیر ارسالی",
+      status: 500,
+    };
+  }
 }
 
 export function formDataMaker(
@@ -103,7 +112,7 @@ export function formDataMaker(
 
 export async function fetchWithRetry(
   url: string,
-  headers: HeadersInit ,
+  headers: HeadersInit,
   options: RequestInit = {},
   cacheTime = 0,
   revalidateTags?: string[] | string,

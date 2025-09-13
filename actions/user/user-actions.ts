@@ -8,6 +8,7 @@ import {
 import { fetchWithRetryServer } from "@/src/lib/serverUtils";
 import { getTokenAccess } from "../authActions";
 import { ApiResponse } from "../types";
+import { parseData } from "@/src/lib/utils";
 
 export async function profileShow() {
   const res = await fetchWithRetryServer<User>("/profile", {
@@ -21,20 +22,24 @@ export async function profileShow() {
 export async function profileUpdatePromise(
   data: UpdateProfileSchemaType
 ): Promise<ApiResponse<User>> {
-  const parsedData = updateProfileSchema.safeParse(data);
-  if (!parsedData.success) {
-    const { fieldErrors, formErrors } = parsedData.error.flatten();
-
-    return {
-      ok: false,
-      message:'خطا در مقادیر ارسالی',
-      status: 422,
-       errors: {
-        ...fieldErrors,
-        ...(formErrors.length ? { _form: formErrors } : {}),
-      },
-    };
+  // const parsedData = updateProfileSchema.safeParse(data);
+  const parsedData = parseData(data, updateProfileSchema);
+  if(parsedData){
+    return parsedData;
   }
+  // if (!parsedData.success) {
+  //   const { fieldErrors, formErrors } = parsedData.error.flatten();
+
+  //   return {
+  //     ok: false,
+  //     message:'خطا در مقادیر ارسالی',
+  //     status: 422,
+  //      errors: {
+  //       ...fieldErrors,
+  //       ...(formErrors.length ? { _form: formErrors } : {}),
+  //     },
+  //   };
+  // }
 
   const res = await fetchWithRetryServer<User>("/profile", {
     options: {
