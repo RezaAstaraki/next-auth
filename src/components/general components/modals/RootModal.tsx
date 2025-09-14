@@ -31,10 +31,6 @@ export default function RootModal({}: Props) {
   } = useAppSelector((state) => state.modal);
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    dispatch(setModalClose());
-  }, []);
-
   const targetRef = useRef(null);
   const { moveProps } = useDraggable({
     targetRef,
