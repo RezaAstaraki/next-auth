@@ -5,6 +5,8 @@ import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { ZodSchema } from "zod";
 import { dataParser } from "./utils";
+import { errorResponse } from "./constants/constants";
+import { getTokenAccess } from "@/actions/authActions";
 
 const cookieName = process.env.COOKIE_NAME as string;
 
@@ -17,12 +19,11 @@ type FetchOptions = {
   retries?: number;
 };
 
-export const adminAuthorizedHeader = async () => {
-  const cookie = await cookies();
+export const authorizedHeader = async (headers?:HeadersInit) => {
+  const accessToken = await getTokenAccess();
   return {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${cookie.get("aact")?.value}`,
+    Authorization: `Bearer ${accessToken}`,
+    ...headers
   };
 };
 
@@ -59,8 +60,12 @@ export async function fetchWithRetryServer<T>(
       return parsed;
     }
   }
-  const internalHeader: HeadersInit =
-    headers ?? (await adminAuthorizedHeader());
+
+  const internalHeader: HeadersInit = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    ...(headers ?? { ...(await authorizedHeader()) }),
+  };
 
   for (let i = 0; i < retries; i++) {
     console.warn({ retry: i + 1, url });
@@ -94,11 +99,7 @@ export async function fetchWithRetryServer<T>(
     }
   }
 
-  return {
-    ok: false,
-    message: "Unexpected error",
-    status: 500,
-  };
+  return errorResponse;
 }
 
 export async function serverHandleResponse<T>(

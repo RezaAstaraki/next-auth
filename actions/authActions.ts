@@ -12,7 +12,7 @@ import { cookies } from "next/headers";
 import { VerifyOtpResponseType } from "./types/BackendApiResponseTypes";
 import { formDataMaker } from "@/src/lib/utils";
 import { errorResponse } from "@/src/lib/constants/constants";
-import { fetchWithRetryServer } from "@/src/lib/serverUtils";
+import {  authorizedHeader, fetchWithRetryServer } from "@/src/lib/serverUtils";
 import { User } from "@/schemas/third-party-api-schemas";
 
 // type CaptchaType = {
@@ -162,3 +162,13 @@ export const getTokenAccess = async () => {
   const jwt = await getDecodedToken();
   return jwt?.user?.token;
 };
+
+export async function test(headers?:HeadersInit ) {
+     const internalHeader: HeadersInit = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    ...(headers ?? { ...(await authorizedHeader({new:'nn',Accept:'gg'})) }),
+  };
+  console.log(internalHeader)
+  return internalHeader
+}
