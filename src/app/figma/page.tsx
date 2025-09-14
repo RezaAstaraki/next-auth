@@ -1,3 +1,4 @@
+import NotFound from "@/src/components/general components/not-found/NotFound";
 import { siteConfig } from "@/src/config/site";
 import { notFound, redirect, RedirectType } from "next/navigation";
 
@@ -11,6 +12,6 @@ export default function page({}: Props) {
   ) {
     redirect(siteConfig.links?.figma, RedirectType.replace);
   } else {
-    return notFound();
+    return <NotFound/>;
   }
 }
