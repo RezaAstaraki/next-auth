@@ -640,17 +640,54 @@ export const LogoIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => (
   <svg
-    fill="none"
-    height={size || height}
-    viewBox="0 0 32 32"
-    width={size || width}
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 1024 1024"
+    width={width ?? size}
+    height={height ?? size}
     {...props}
   >
+    <circle fill="#3366FF" cx="504.87" cy="515.11" r="482.71" />
     <path
-      clipRule="evenodd"
-      d="M17.6482 10.1305L15.8785 7.02583L7.02979 22.5499H10.5278L17.6482 10.1305ZM19.8798 14.0457L18.11 17.1983L19.394 19.4511H16.8453L15.1056 22.5499H24.7272L19.8798 14.0457Z"
-      fill="currentColor"
-      fillRule="evenodd"
+      fill="none"
+      stroke="#FFFFFF"
+      strokeWidth={45}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeMiterlimit={10}
+      d="M102.17,306.58h92.52c17.58,0,33.35,10.85,39.63,27.28l99.37,259.98c7.72,20.2,27.1,33.53,48.72,33.53h322.09
+	c17.58,0,32.97-11.82,37.5-28.81l10.32-38.68c6.05-22.69-10.92-44.99-34.4-45.2l-263.52-2.43c-16.25-0.15-30.94-9.67-37.72-24.44
+	l-28.34-61.76c-11.53-25.12,6.92-53.72,33.5-60.45l494.62,2.52"
+    />
+    <circle
+      fill="#FFFFFF"
+      stroke="#FFFFFF"
+      strokeWidth={24}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeMiterlimit={10}
+      cx="659.6"
+      cy="733.53"
+      r="32.85"
+    />
+    <circle
+      fill="#FFFFFF"
+      stroke="#FFFFFF"
+      strokeWidth={24}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeMiterlimit={10}
+      cx="426.22"
+      cy="733.53"
+      r="32.85"
+    />
+    <polygon
+      fill="#FFFFFF"
+      stroke="#FFFFFF"
+      strokeWidth={0.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeMiterlimit={10}
+      points="59.48,328.86 102.35,328.86 102.17,284.46 80.73,284.46 69.88,305.59"
     />
   </svg>
 );

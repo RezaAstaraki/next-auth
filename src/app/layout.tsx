@@ -2,7 +2,6 @@ import "@/src/styles/globals.css";
 import { Metadata, Viewport } from "next";
 import { Link } from "@heroui/link";
 import clsx from "clsx";
-import pkg from "@/package.json";
 
 import { siteConfig } from "@/src/config/site";
 import { fontSans } from "@/src/config/fonts";
@@ -10,6 +9,7 @@ import { Navbar } from "@/src/components/navbar";
 import NextUiProviders from "../components/providers/nextui-provider/NextuiProviders";
 import RootModal from "../components/general components/modals/RootModal";
 import { Toaster } from "sonner";
+import Footer from "../components/footer/Footer";
 
 export const metadata: Metadata = {
   title: {
@@ -38,7 +38,7 @@ export default async function RootLayout({
     <html suppressHydrationWarning lang="en">
       <head />
       <body
-      dir="rlt"
+        dir="rlt"
         className={clsx(
           "min-h-screen text-foreground bg-background font-sans antialiased",
           fontSans.variable
@@ -52,9 +52,7 @@ export default async function RootLayout({
             <main className="container mx-auto flex flex-1 flex-col max-w-7xl pt-16 px-6 flex-grow">
               {children}
             </main>
-            <footer className="w-full flex text-xs items-center justify-center py-3">
-              {pkg.name}-version-{pkg.version}
-            </footer>
+            <Footer />
           </div>
           <RootModal />
           <Toaster dir="rtl" richColors position="top-center" expand />

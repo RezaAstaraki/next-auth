@@ -3,6 +3,7 @@ import pkg from "@/package.json";
 
 export const siteConfig = {
   name: pkg.name,
+  siteTitle:"site Title",
   description: "Make beautiful websites regardless of your design experience.",
   navItems: [
     {
