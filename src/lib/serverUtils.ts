@@ -13,14 +13,16 @@ const cookieName = process.env.COOKIE_NAME as string;
 type FetchOptions = {
   options?: RequestInit;
   headers?: HeadersInit;
+  authorizedHeaders?:HeadersInit;
   cacheTime?: number;
   revalidateTags?: string[] | string;
   delayTime?: number;
   retries?: number;
+  needUpdateToken?:boolean
 };
 
-export const authorizedHeader = async (headers?:HeadersInit) => {
-  const accessToken = await getTokenAccess();
+export const authorizedHeader = async (headers?:HeadersInit,needUpdate:boolean=false) => {
+  const accessToken = await getTokenAccess(needUpdate);
   return {
     Authorization: `Bearer ${accessToken}`,
     ...headers
@@ -35,22 +37,17 @@ export const ServerUrlMaker = (endPoint: string) => {
   return `${baseUrl}${endPoint}`;
 };
 
-// export type ApiError = {
-//   ok: false;
-//   message: string;
-//   errors?: Record<string, string[]>;
-//   status: number;
-// };
-
-export async function fetchWithRetryServer<T>(
+export async function extendedFetchServer<T>(
   url: string,
   {
     options = {},
     headers,
+    authorizedHeaders,
     cacheTime = 0,
     revalidateTags,
     delayTime = 500,
     retries = 3,
+    needUpdateToken=false
   }: FetchOptions = {},
   schema?: ZodSchema
 ): Promise<ApiResponse<T>> {
@@ -64,7 +61,7 @@ export async function fetchWithRetryServer<T>(
   const internalHeader: HeadersInit = {
     Accept: "application/json",
     "Content-Type": "application/json",
-    ...(headers ?? { ...(await authorizedHeader()) }),
+    ...(headers ?? { ...(await authorizedHeader({...authorizedHeaders},needUpdateToken)) }),
   };
 
   for (let i = 0; i < retries; i++) {
