@@ -6,7 +6,6 @@ import {
   User,
 } from "@/schemas/third-party-api-schemas";
 import { extendedFetchServer } from "@/src/lib/serverUtils";
-import { getTokenAccess } from "../authActions";
 import { ApiResponse } from "../types";
 
 export async function profileShow() {

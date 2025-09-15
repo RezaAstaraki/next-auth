@@ -147,13 +147,3 @@ export const getTokenAccess = async ( needUpdate: boolean = false) => {
   return jwt?.user?.token;
 };
 
-export async function test(headers?: HeadersInit) {
-  const internalHeader: HeadersInit = {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    ...(headers ?? {
-      ...(await authorizedHeader({ new: "nn", Accept: "gg" },true)),
-    }),
-  };
-  return internalHeader;
-}
