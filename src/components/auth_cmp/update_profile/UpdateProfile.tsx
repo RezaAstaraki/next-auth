@@ -1,4 +1,4 @@
-import { profileUpdatePromise } from "@/actions/user/user-actions";
+import { profileUpdate } from "@/actions/user/user-actions";
 import {
   updateProfileSchema,
   UpdateProfileSchemaType,
@@ -18,7 +18,7 @@ export default function UpdateProfile({}: Props) {
   });
 
   const updateProfileMutate = useFormMutation({
-    mutationFn: profileUpdatePromise,
+    mutationFn: profileUpdate,
     mutationKey: ["updateProfile"],
   },{toastContent:'all',hookForm:updateProfileForm});
 

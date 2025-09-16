@@ -7,6 +7,9 @@ import { ZodSchema } from "zod";
 import { dataParser } from "./utils";
 import { errorResponse } from "./constants/constants";
 import { getTokenAccess } from "@/actions/authActions";
+import { User } from "@/schemas/authSchemas";
+import { auth } from "@/auth_setup/next_auth";
+import { decode } from "next-auth/jwt";
 
 const cookieName = process.env.COOKIE_NAME as string;
 
@@ -137,3 +140,5 @@ export async function serverHandleResponse<T>(
     };
   }
 }
+
+

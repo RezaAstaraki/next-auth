@@ -10,6 +10,7 @@ import NextUiProviders from "../components/providers/nextui-provider/NextuiProvi
 import RootModal from "../components/general components/modals/RootModal";
 import { Toaster } from "sonner";
 import Footer from "../components/footer/Footer";
+import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
   title: {
@@ -44,19 +45,21 @@ export default async function RootLayout({
           fontSans.variable
         )}
       >
-        <NextUiProviders
-          themeProps={{ attribute: "class", defaultTheme: "dark" }}
-        >
-          <div className="relative flex flex-col h-screen">
-            <Navbar />
-            <main className="container mx-auto flex flex-1 flex-col max-w-7xl pt-16 px-6 flex-grow">
-              {children}
-            </main>
-            <Footer />
-          </div>
-          <RootModal />
-          <Toaster dir="rtl" richColors position="top-center" expand />
-        </NextUiProviders>
+        <SessionProvider>
+          <NextUiProviders
+            themeProps={{ attribute: "class", defaultTheme: "dark" }}
+          >
+            <div className="relative flex flex-col h-screen">
+              <Navbar />
+              <main className="container mx-auto flex flex-1 flex-col max-w-7xl pt-16 px-6 flex-grow">
+                {children}
+              </main>
+              <Footer />
+            </div>
+            <RootModal />
+            <Toaster dir="rtl" richColors position="top-center" expand />
+          </NextUiProviders>
+        </SessionProvider>
       </body>
     </html>
   );

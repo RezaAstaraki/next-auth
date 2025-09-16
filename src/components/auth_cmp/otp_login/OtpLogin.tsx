@@ -29,7 +29,7 @@ import { toast } from "sonner";
 import { signInOtpAction } from "@/actions/authActions";
 type StepType = "MobileStep" | "SendOtpStep";
 type Props = {
-  stepRender: StepType;
+  stepRender?: StepType;
   uiStepOne?: React.ReactNode;
   uiStepTwo?: React.ReactNode;
 };
@@ -172,6 +172,7 @@ const SendOtpStep = () => {
 
   const submitOtpForm = async (data: OtpSchemaType) => {
    const res =await mutateOtp.mutateAsync({...data,mobile:otpState.mobile,request_id:otpState.request_id});
+   console.log('res of op submit ',res)
   };
 
   const { time } = useCountDownTimer(otpState.expires_at);
