@@ -169,6 +169,7 @@ export async function signInOtpAction(
         },
         retries: 3,
         delayTime: 500,
+        needUpdateToken: false,
       }
     );
     if (res.ok) {
@@ -179,7 +180,7 @@ export async function signInOtpAction(
         expireIn: res.body.expires_in,
         refreshToken: res.body.refresh_token,
         accessToken: res.body.access_token,
-        accessTokenExpiration: decodedJwt.exp-3550,
+        accessTokenExpiration: decodedJwt.exp - 3550,
       };
       //showd remove
 
@@ -200,11 +201,11 @@ export const signoutAction = async () => {
 export const getDecodedToken = async (
   needUpdate: boolean = true
 ): Promise<JWTType | null> => {
-  console.log({needUpdateingetDecodedToken:needUpdate})
+  console.log({ needUpdateingetDecodedToken: needUpdate });
   if (needUpdate) await auth();
   const rawToken = (await cookies()).get("authjs.session-token")?.value;
   if (!rawToken) return null;
-  
+
   const decodedToken: any = await decode({
     token: rawToken,
     secret: process.env.AUTH_SECRET || "",
@@ -214,7 +215,7 @@ export const getDecodedToken = async (
 };
 
 export const getTokenAccess = async (needUpdate: boolean = true) => {
-  console.log({needUpdateingetTokenAccess:needUpdate})
+  console.log({ needUpdateingetTokenAccess: needUpdate });
   // if(needUpdate) await auth()
   const jwt = await getDecodedToken(needUpdate);
   return jwt?.user?.accessToken;
@@ -229,23 +230,19 @@ export const getTokenAccess = async (needUpdate: boolean = true) => {
 export async function refreshTokens(
   refreshToken: string
 ): Promise<ApiResponse<RefreshResponseType>> {
-  const res = await extendedFetchServer<RefreshResponseType>(
-    "/auth/refresh",
-    {
-      options: {
-        method: "POST",
-        body: JSON.stringify({ refresh_token: refreshToken }),
-      },
-      needUpdateToken: false,
-    }
-  );
-  return res ;
+  const res = await extendedFetchServer<RefreshResponseType>("/auth/refresh", {
+    options: {
+      method: "POST",
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    },
+    needUpdateToken: false,
+  });
+  return res;
 }
 
 export async function callAuth() {
-  await auth()
-  return {called:true}
-  
+  await auth();
+  return { called: true };
 }
 
 // export async function setNewTokens(res:RefreshResponseType){
@@ -268,7 +265,7 @@ export async function callAuth() {
 //   if(!ss) return
 //   const res = await refreshTokens(ss?.user.refreshToken)
 //   if(res.ok){
-    
+
 //     setNewTokens(res.body)
 //   }else{
 //     console.log(res.errors)

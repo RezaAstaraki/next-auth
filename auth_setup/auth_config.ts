@@ -8,17 +8,17 @@ import { jwtDecode } from "jwt-decode";
 
 declare module "next-auth" {
   interface Session {
-    user: User & DefaultSession["user"]; 
+    user: User & DefaultSession["user"];
     error?: "RefreshTokenError";
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    access_token: string
-    expires_at: number
-    refresh_token?: string
-    error?: "RefreshTokenError"
+    access_token: string;
+    expires_at: number;
+    refresh_token?: string;
+    error?: "RefreshTokenError";
   }
 }
 
@@ -140,7 +140,7 @@ export const authConfig = {
           myuser = newDecodedAccessToken.user;
           myuser.refreshToken = res.body.refresh_token;
           myuser.accessToken = res.body.access_token;
-          myuser.accessTokenExpiration = newDecodedAccessToken.exp-3550;
+          myuser.accessTokenExpiration = newDecodedAccessToken.exp - 3550;
 
           //showd remove
 
@@ -157,14 +157,12 @@ export const authConfig = {
 
           token["user"] = myuser;
 
-          console.log('token in final jwt',token.uer)
+          console.log("token in final jwt", token.uer, { myuser });
 
           // myuser. =res.body.token_type
         } else {
-          
-          console.error('error in refresh',res.message);
+          console.error("error in refresh", res.message);
           (token as any).error = "RefreshTokenInvalid";
-          
         }
         // const user: JWTType["user"] =token.user
         // user.accessToken="ssss"
@@ -188,7 +186,7 @@ export const authConfig = {
       return token;
     },
     session: async ({ session, token, user, trigger }) => {
-      session.error = token.error
+      session.error = token.error;
 
       // console.log("triger in session", trigger);
       if (session.user) {

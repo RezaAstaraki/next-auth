@@ -155,3 +155,7 @@ export async function handleFetchResponse(
     };
   }
 }
+
+export async function delay(delayTime: number) {
+  await new Promise((resolve) => setTimeout(resolve, delayTime));
+}
