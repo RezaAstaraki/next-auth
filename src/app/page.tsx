@@ -5,6 +5,7 @@ import OtpLogin from "../components/auth_cmp/otp_login/OtpLogin";
 import { otpres } from "@/test";
 import { jwtDecode } from "jwt-decode";
 import {
+  callAuth,
   getDecodedToken,
 } from "@/actions/authActions";
 import { profileShow } from "@/actions/user/user-actions";
@@ -12,7 +13,7 @@ import { ref } from "process";
 import UpdateProfile from "../components/auth_cmp/update_profile/UpdateProfile";
 
 export default function HomePage() {
-  const { data: session, update } = useSession()
+  const { data: session, update ,status} = useSession()
   return (
     <section className="flex flex-1 flex-col items-center justify-center gap-4 py-8 md:py-10">
       <OtpLogin />
@@ -34,21 +35,20 @@ export default function HomePage() {
       </Button>
       <button
         onClick={async () => {
-          console.log("Before update:", session);
+          console.log("Before update:", session,{status});
           await update("update");
         }}
       >
         Trigger update
       </button>
-
-      {/* <Button
+      <Button
         onPress={async () => {
-          const res = await refreshTokens("sss");
-          console.log(res);
-          }}
-          >
-        show profile
-        </Button> */}
+          console.log({session},{status})
+
+        }}
+      >
+        show session
+      </Button>
       <Button
         onPress={async () => {
           //  const ss = await getDecodedToken();
@@ -62,9 +62,12 @@ export default function HomePage() {
           //    }
           //  }
           // refre()
+
+          const res  =await callAuth()
+          console.log(res)
         }}
       >
-        refresh
+        call auth
       </Button>
       <UpdateProfile />
     </section>

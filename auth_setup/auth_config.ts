@@ -8,7 +8,17 @@ import { jwtDecode } from "jwt-decode";
 
 declare module "next-auth" {
   interface Session {
-    user: User & DefaultSession["user"]; // Keep default user properties
+    user: User & DefaultSession["user"]; 
+    error?: "RefreshTokenError";
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    access_token: string
+    expires_at: number
+    refresh_token?: string
+    error?: "RefreshTokenError"
   }
 }
 
@@ -100,15 +110,13 @@ export const authConfig = {
   ],
   callbacks: {
     jwt: async ({ token, user, session, account, trigger }) => {
+      console.log("in jwt callback");
       if (user) {
-        //   token['user']=user
-        // token['id'] = user.id;
         token["user"] = user;
       }
 
       console.log({ trigger });
       let manualTrigger;
-      // let myuser: JWTType["user"] = token.user;
       let myuser: any = token.user;
       const exxxp = Math.floor(Number(myuser.accessTokenExpiration) * 1000);
       if (myuser) {
@@ -120,19 +128,21 @@ export const authConfig = {
           manualTrigger = true;
         }
       }
-      if (trigger === "update" || manualTrigger) {
-        // console.log(">>>>>>>>>>in update<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+      if (trigger === "update" || !!manualTrigger) {
+        console.log(">>>>>>>>>>in update<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         const res = await refreshTokens(myuser.refreshToken);
         // console.log("res of new tokens", res);
         if (res.ok) {
           const newDecodedAccessToken: JWTType = jwtDecode(
             res.body.access_token
           );
-          // console.log("sssssss", newDecodedAccessToken);
+          console.log("sssssss", newDecodedAccessToken);
           myuser = newDecodedAccessToken.user;
           myuser.refreshToken = res.body.refresh_token;
           myuser.accessToken = res.body.access_token;
-          myuser.accessTokenExpiration = newDecodedAccessToken.exp;
+          myuser.accessTokenExpiration = newDecodedAccessToken.exp-3550;
+
+          //showd remove
 
           // myuser.accessTokenExpiration=newDecodedAccessToken.exp
           // myuser.created_at=newDecodedAccessToken.user.verified_at
@@ -147,9 +157,14 @@ export const authConfig = {
 
           token["user"] = myuser;
 
+          console.log('token in final jwt',token.uer)
+
           // myuser. =res.body.token_type
-        }else{
-          throw res.message
+        } else {
+          
+          console.error('error in refresh',res.message);
+          (token as any).error = "RefreshTokenInvalid";
+          
         }
         // const user: JWTType["user"] =token.user
         // user.accessToken="ssss"
@@ -173,6 +188,8 @@ export const authConfig = {
       return token;
     },
     session: async ({ session, token, user, trigger }) => {
+      session.error = token.error
+
       // console.log("triger in session", trigger);
       if (session.user) {
         // session.user["name"] = "ssss";

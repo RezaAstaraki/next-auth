@@ -24,7 +24,7 @@ type FetchOptions = {
   needUpdateToken?:boolean
 };
 
-export const authorizedHeader = async (headers?:HeadersInit,needUpdate:boolean=false) => {
+export const authorizedHeader = async (headers?:HeadersInit,needUpdate:boolean=true) => {
   const accessToken = await getTokenAccess(needUpdate);
   return {
     Authorization: `Bearer ${accessToken}`,
@@ -50,7 +50,7 @@ export async function extendedFetchServer<T>(
     revalidateTags,
     delayTime = 500,
     retries = 3,
-    needUpdateToken=false
+    needUpdateToken=true
   }: FetchOptions = {},
   schema?: ZodSchema
 ): Promise<ApiResponse<T>> {
@@ -60,6 +60,7 @@ export async function extendedFetchServer<T>(
       return parsed;
     }
   }
+  console.log({needUpdateTokeninextendedFetchServer:needUpdateToken})
 
   const internalHeader: HeadersInit = {
     Accept: "application/json",

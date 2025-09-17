@@ -11,10 +11,11 @@ import RootModal from "../components/general components/modals/RootModal";
 import { Toaster } from "sonner";
 import Footer from "../components/footer/Footer";
 import { SessionProvider } from "next-auth/react";
+import SessionChecker from "@/auth_setup/client-side/components/sessionChecker";
 
 export const metadata: Metadata = {
   title: {
-    default: siteConfig.name,
+    default: siteConfig.siteTitle,
     template: `%s - ${siteConfig.name}`,
   },
   description: siteConfig.description,
@@ -46,19 +47,21 @@ export default async function RootLayout({
         )}
       >
         <SessionProvider>
-          <NextUiProviders
-            themeProps={{ attribute: "class", defaultTheme: "dark" }}
-          >
-            <div className="relative flex flex-col h-screen">
-              <Navbar />
-              <main className="container mx-auto flex flex-1 flex-col max-w-7xl pt-16 px-6 flex-grow">
-                {children}
-              </main>
-              <Footer />
-            </div>
-            <RootModal />
-            <Toaster dir="rtl" richColors position="top-center" expand />
-          </NextUiProviders>
+          <SessionChecker>
+            <NextUiProviders
+              themeProps={{ attribute: "class", defaultTheme: "dark" }}
+            >
+              <div className="relative flex flex-col h-screen">
+                <Navbar />
+                <main className="container mx-auto flex flex-1 flex-col max-w-7xl pt-16 px-6 flex-grow">
+                  {children}
+                </main>
+                <Footer />
+              </div>
+              <RootModal />
+              <Toaster dir="rtl" richColors position="top-center" expand />
+            </NextUiProviders>
+          </SessionChecker>
         </SessionProvider>
       </body>
     </html>

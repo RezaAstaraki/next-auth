@@ -10,6 +10,10 @@ import { ApiResponse } from "../types";
 
 export async function profileShow() {
   const res = await extendedFetchServer<User>("/profile", {
+    options: {
+      method: "GET",
+    },
+    needUpdateToken: true,
   });
   return res;
 }
@@ -23,6 +27,7 @@ export async function profileUpdate(
         method: "POST",
         body: JSON.stringify(data),
       },
+      needUpdateToken: true,
     },
     updateProfileSchema
   );
