@@ -170,7 +170,6 @@ export async function signInOtpAction(
         },
         retries: 3,
         delayTime: 500,
-        needUpdateToken: false,
       }
     );
    
@@ -182,11 +181,13 @@ export async function signInOtpAction(
         expireIn: res.body.expires_in,
         refreshToken: res.body.refresh_token,
         accessToken: res.body.access_token,
-        accessTokenExpiration: decodedJwt.exp,
-        // accessTokenExpiration: decodedJwt.exp - 3550,
+        // accessTokenExpiration: decodedJwt.exp,
+
+
+        //should remove
+        accessTokenExpiration: decodedJwt.exp - Number(process.env.NEXT_PUBLIC_SECONDS_TO_REDUCE ?? 0),
       };
       exp = decodedJwt.exp
-      //should remove
 
       await ServerSignIn("otp", credentials);
     }
@@ -224,10 +225,8 @@ export const signoutAction = async () => {
 };
 
 export const getDecodedToken = async (
-  needUpdate: boolean = true
+  
 ): Promise<JWTType | null> => {
-  console.log({ needUpdateingetDecodedToken: needUpdate });
-  if (needUpdate) await auth();
   const rawToken = (await cookies()).get("authjs.session-token")?.value;
   if (!rawToken) return null;
 
@@ -239,10 +238,8 @@ export const getDecodedToken = async (
   return decodedToken as JWTType;
 };
 
-export const getTokenAccess = async (needUpdate: boolean = true) => {
-  console.log({ needUpdateingetTokenAccess: needUpdate });
-  // if(needUpdate) await auth()
-  const jwt = await getDecodedToken(needUpdate);
+export const getTokenAccess = async () => {
+  const jwt = await getDecodedToken();
   return jwt?.user?.accessToken;
 };
 
@@ -260,14 +257,13 @@ export async function refreshTokens(
       method: "POST",
       body: JSON.stringify({ refresh_token: refreshToken }),
     },
-    needUpdateToken: false,
   });
   return res;
 }
 
 export async function callAuth() {
-  await auth();
-  return { called: true };
+  const session  = await auth();
+  return { called: session };
 }
 
 import { headers } from "next/headers";

@@ -32,7 +32,7 @@ export default function HomePage() {
       <OtpLogin />
       <Button
         onPress={async () => {
-          const res = await getDecodedToken(true);
+          const res = await getDecodedToken();
           if (res) console.log(res);
         }}
       >

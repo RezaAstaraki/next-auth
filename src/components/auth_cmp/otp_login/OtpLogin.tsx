@@ -186,7 +186,7 @@ const SendOtpStep = () => {
     console.log("res of op submit ", res);
     if(res.ok){
       dispatch(resetOtp())
-      dispatch(setExpirationTime(res.body.exp))
+      dispatch(setExpirationTime(Number(res.body.exp) - Number(process.env.NEXT_PUBLIC_SECONDS_TO_REDUCE ?? 0) ))
       dispatch(setIsUserLoggedIn({isLoggedIn:true}))
       window.location.href = res.body.url
     }else{

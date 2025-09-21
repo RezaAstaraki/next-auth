@@ -10,6 +10,7 @@ declare module "next-auth" {
   interface Session {
     user: User & DefaultSession["user"];
     error?: "RefreshTokenError";
+    exp:number;
   }
 }
 
@@ -117,50 +118,49 @@ export const authConfig = {
 
       console.log({ trigger });
       let manualTrigger;
-      let myuser: any = token.user;
-      const exxxp = Math.floor(Number(myuser.accessTokenExpiration) * 1000);
-      if (myuser) {
+      let myUser: any = token.user;
+      const exxxp = Number(myUser.accessTokenExpiration);
+      if (myUser) {
         console.log(
           { exp: exxxp },
-          { now: Date.now(), diff: (exxxp - Date.now()) / 1000 / 60 }
+          { now: Date.now()/1000, diff: (exxxp -( Date.now()) /1000 )/60}
         );
-        if (exxxp < Date.now()) {
+        if (exxxp < (Date.now()/1000)) {
           manualTrigger = true;
         }
       }
       if (trigger === "update" || !!manualTrigger) {
         console.log(">>>>>>>>>>in update<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-        const res = await refreshTokens(myuser.refreshToken);
-        // console.log("res of new tokens", res);
+        const res = await refreshTokens(myUser.refreshToken);
         if (res.ok) {
           const newDecodedAccessToken: JWTType = jwtDecode(
             res.body.access_token
           );
-          console.log("sssssss", newDecodedAccessToken);
-          myuser = newDecodedAccessToken.user;
-          myuser.refreshToken = res.body.refresh_token;
-          myuser.accessToken = res.body.access_token;
-          myuser.accessTokenExpiration = newDecodedAccessToken.exp ;
-          // myuser.accessTokenExpiration = newDecodedAccessToken.exp - 3550;
-
+          console.log("newDecodedAccessToken", newDecodedAccessToken);
+          myUser = newDecodedAccessToken.user;
+          myUser.refreshToken = res.body.refresh_token;
+          myUser.accessToken = res.body.access_token;
+          // myUser.accessTokenExpiration = newDecodedAccessToken.exp ;
           //should remove
+          myUser.accessTokenExpiration = newDecodedAccessToken.exp - Number(process.env.NEXT_PUBLIC_SECONDS_TO_REDUCE ?? 0);
 
-          // myuser.accessTokenExpiration=newDecodedAccessToken.exp
-          // myuser.created_at=newDecodedAccessToken.user.verified_at
-          // myuser.first_name=newDecodedAccessToken.user.first_name
-          // myuser.last_name=newDecodedAccessToken.user.last_name
-          // myuser.id=newDecodedAccessToken.user.id
-          // myuser.created_at=newDecodedAccessToken.user.created_at
-          // myuser.email=newDecodedAccessToken.user.email
-          // myuser.mobile=newDecodedAccessToken.user.mobile
-          // myuser.national_code=newDecodedAccessToken.user.national_code
-          // myuser.=newDecodedAccessToken.user.national_code
 
-          token["user"] = myuser;
+          // myUser.accessTokenExpiration=newDecodedAccessToken.exp
+          // myUser.created_at=newDecodedAccessToken.user.verified_at
+          // myUser.first_name=newDecodedAccessToken.user.first_name
+          // myUser.last_name=newDecodedAccessToken.user.last_name
+          // myUser.id=newDecodedAccessToken.user.id
+          // myUser.created_at=newDecodedAccessToken.user.created_at
+          // myUser.email=newDecodedAccessToken.user.email
+          // myUser.mobile=newDecodedAccessToken.user.mobile
+          // myUser.national_code=newDecodedAccessToken.user.national_code
+          // myUser.=newDecodedAccessToken.user.national_code
 
-          console.log("token in final jwt", token.uer, { myuser });
+          token["user"] = myUser;
 
-          // myuser. =res.body.token_type
+          console.log("token in final jwt", token.uer, { myUser });
+
+          // myUser. =res.body.token_type
         } else {
           console.error("error in refresh", res.message);
           (token as any).error = "RefreshTokenInvalid";
@@ -191,6 +191,10 @@ export const authConfig = {
 
       // console.log("triger in session", trigger);
       if (session.user) {
+        const receivedToken  :any = token.user
+        console.log({receivedToken})
+        session.exp=receivedToken.accessTokenExpiration
+        // session.user["accessTokenExpiration"]=receivedToken.user.accessTokenExpiration as number
         // session.user["name"] = "ssss";
         // session.user["first_name"] = token.user.first_name as string;
         // session.user["last_name"] = token.user.last_name as string;

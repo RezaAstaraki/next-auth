@@ -2,7 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/store";
-import { resetUserState } from "../redux/features/customer/userSlice";
+import {
+  resetUserState,
+  setExpirationTime,
+} from "../redux/features/customer/userSlice";
 import { useSession } from "next-auth/react";
 import { ApiError, ApiResponse } from "@/actions/types";
 
@@ -16,23 +19,32 @@ export const userAuthChecker = <
   const [loading, setLoading] = useState(false);
   const { data, status, update } = useSession();
 
-  const isUserLoggedIN = async () => {
-    if (userSate.expirationTime > Date.now()) {
-      return true;
-    } else {
-      const state = await update("need Update");
-      console.log("return from update", { state });
-      //   if(status === "authenticated"){
-
-      // }
-    }
-  };
-
   const loadingRef = useRef(userSate.loading);
-
   useEffect(() => {
     loadingRef.current = userSate.loading;
   }, [userSate.loading]);
+
+  const isUserLoggedIN = async () => {
+    console.log(
+      userSate.expirationTime > Date.now() / 1000,
+      userSate.expirationTime
+    );
+    if (userSate.expirationTime > Date.now() / 1000) {
+      return true;
+    } else {
+      const state = await update("need Update");
+      console.log("return from update in use authChecker", { state });
+
+      if (status === null) {
+        return false;
+      } else {
+        if (state?.exp ) {
+          dispatch(setExpirationTime(state?.exp))
+        }
+        return true;
+      }
+    }
+  };
 
   const waitForLoadingToFinish = async () => {
     return new Promise<void>((resolve) => {
@@ -60,14 +72,18 @@ export const userAuthChecker = <
         const response: ApiError = {
           ok: false,
           message: "user is not Logged in",
-          status: 402,
+          status: 401,
         };
         return response;
       }
 
+      if (!(await isUserLoggedIN())) {
+        console.log("second check");
+      }
+
       const result = await action(...args);
 
-      if (result?.status === 402) {
+      if (result?.status === 401) {
         const isLoginState = await isUserLoggedIN();
         if (!isLoginState) {
           dispatch(resetUserState());

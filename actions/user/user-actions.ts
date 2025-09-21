@@ -13,7 +13,6 @@ export async function profileShow() {
     options: {
       method: "GET",
     },
-    needUpdateToken: true,
   });
   return res;
 }
@@ -27,7 +26,6 @@ export async function profileUpdate(
         method: "POST",
         body: JSON.stringify(data),
       },
-      needUpdateToken: true,
     },
     updateProfileSchema
   );
