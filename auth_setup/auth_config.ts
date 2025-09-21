@@ -140,9 +140,10 @@ export const authConfig = {
           myuser = newDecodedAccessToken.user;
           myuser.refreshToken = res.body.refresh_token;
           myuser.accessToken = res.body.access_token;
-          myuser.accessTokenExpiration = newDecodedAccessToken.exp - 3550;
+          myuser.accessTokenExpiration = newDecodedAccessToken.exp ;
+          // myuser.accessTokenExpiration = newDecodedAccessToken.exp - 3550;
 
-          //showd remove
+          //should remove
 
           // myuser.accessTokenExpiration=newDecodedAccessToken.exp
           // myuser.created_at=newDecodedAccessToken.user.verified_at

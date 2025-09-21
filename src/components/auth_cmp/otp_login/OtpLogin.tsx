@@ -1,6 +1,5 @@
 "use client";
 
-
 import {
   MobileSchemaType,
   OtpSchemaType,
@@ -23,10 +22,11 @@ import { Input } from "@heroui/input";
 import { InputOtp, Spinner } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect,} from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { signInOtpAction } from "@/actions/authActions";
+import { setExpirationTime, setIsUserLoggedIn } from "@/src/redux/features/customer/userSlice";
 type StepType = "MobileStep" | "SendOtpStep";
 type Props = {
   stepRender?: StepType;
@@ -61,10 +61,7 @@ const MobileStep = () => {
       },
       body: JSON.stringify(data),
     });
-    const response = await handleFetchResponseClient(
-      res,
-      mobileForm,
-    );
+    const response = await handleFetchResponseClient(res, mobileForm);
     return response;
   };
 
@@ -144,6 +141,7 @@ const SendOtpStep = () => {
   const otpForm = useForm<OtpSchemaType>();
   const dispatch = useAppDispatch();
   const otpState = useAppSelector((state) => state.otp);
+  
 
   // const mutateOtp = useMutation({
   //   mutationFn: signInOtp,
@@ -162,17 +160,39 @@ const SendOtpStep = () => {
   //   },
   // });
 
-  const mutateOtp = useFormMutation({mutationFn:signInOtpAction,mutationKey:['signInOtp']},{hookForm:otpForm,toastContent:'all'})
+  const mutateOtp = useFormMutation(
+    { mutationFn: signInOtpAction, mutationKey: ["signInOtp"] },
+    { hookForm: otpForm, toastContent: "all" }
+  );
+  // const mutateOtp = useMutation(
+  //   { mutationFn: signInOtpAction, mutationKey: ["signInOtp"], 
+  //     onSettled:(data)=>{
+  //       console.log('data in on settekled',data)
+  //     }
+  //   },
+  // );
   // const mutateOtp = useMutation({mutationFn:signInOtp,mutationKey:['signInOtp']})
-
 
   const isExpired =
     !otpState.expires_at ||
     new Date(otpState.expires_at).getTime() <= Date.now();
 
   const submitOtpForm = async (data: OtpSchemaType) => {
-   const res =await mutateOtp.mutateAsync({...data,mobile:otpState.mobile,request_id:otpState.request_id});
-   console.log('res of op submit ',res)
+    const res = await mutateOtp.mutateAsync({
+      ...data,
+      mobile: otpState.mobile,
+      request_id: otpState.request_id,
+    });
+    console.log("res of op submit ", res);
+    if(res.ok){
+      dispatch(resetOtp())
+      dispatch(setExpirationTime(res.body.exp))
+      dispatch(setIsUserLoggedIn({isLoggedIn:true}))
+      window.location.href = res.body.url
+    }else{
+      console.log('do some thing in else of otp submit')
+    }
+
   };
 
   const { time } = useCountDownTimer(otpState.expires_at);
@@ -182,7 +202,6 @@ const SendOtpStep = () => {
   };
 
   const canResend = true;
-
 
   return (
     <div className="flex flex-col gap-4">

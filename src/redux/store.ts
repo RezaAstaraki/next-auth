@@ -3,12 +3,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from "react-redux";
 import modalReducer from "./features/modal/modalSlice"
 import optSlice from "./features/loginotp/loginOtpSlice"
+import userSlice from "./features/customer/userSlice"
 
 // Creating the Redux store by configuring it with the root reducer
 export const store = configureStore({
     reducer: {
         modal:modalReducer,
-        otp:optSlice
+        otp:optSlice,
+        user:userSlice
     
     },
 });

@@ -157,7 +157,8 @@ type RefreshResponseType = {
 
 export async function signInOtpAction(
   data: AuthWithOTPRequestSchemaType
-): Promise<any> {
+): Promise<ApiResponse<any>> {
+  let exp
   try {
     const res = await extendedFetchServer<VerifyOtpResponseJwtType>(
       "/auth/verify-otp",
@@ -172,6 +173,7 @@ export async function signInOtpAction(
         needUpdateToken: false,
       }
     );
+   
     if (res.ok) {
       const decodedJwt: JWTType = jwtDecode(res.body.access_token);
       const credentials = {
@@ -180,17 +182,40 @@ export async function signInOtpAction(
         expireIn: res.body.expires_in,
         refreshToken: res.body.refresh_token,
         accessToken: res.body.access_token,
-        accessTokenExpiration: decodedJwt.exp - 3550,
+        accessTokenExpiration: decodedJwt.exp,
+        // accessTokenExpiration: decodedJwt.exp - 3550,
       };
-      //showd remove
+      exp = decodedJwt.exp
+      //should remove
 
       await ServerSignIn("otp", credentials);
     }
     return res;
-  } catch (e) {
+  } catch (e: any) {
     console.error("signInOtp error:", e);
-    throw new Error(errorResponse.message);
-    return errorResponse;
+    if (e.digest && e.digest.startsWith("NEXT_REDIRECT")) {
+      // digest format: NEXT_REDIRECT;type;url;statusCode;
+      const parts = e.digest.split(";");
+      const type = parts[1]; // e.g., "push"
+      const url = parts[2]; // e.g., "http://localhost:3000/"
+      const statusCode = parts[3]; // e.g., "307"
+      return {
+        ok: true,
+        status: Number(statusCode),
+        body: {
+          redirect: true,
+          url,
+          type,
+          exp
+        },
+      };
+    } else {
+      return {
+        ok: false,
+        message: e?.message ?? "some thing wnt wrong",
+        status: 500,
+      };
+    }
   }
 }
 
@@ -243,6 +268,22 @@ export async function refreshTokens(
 export async function callAuth() {
   await auth();
   return { called: true };
+}
+
+import { headers } from "next/headers";
+
+export async function callSessionServer() {
+  const cookieHeader = (await headers()).get("cookie"); // get cookies from request
+  const res = await fetch("http://localhost:3000/api/auth/session", {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+      cookie: cookieHeader || "", // forward cookies
+    },
+  });
+  const data = await res.json();
+  console.log("Server session:", data);
+  return data;
 }
 
 // export async function setNewTokens(res:RefreshResponseType){
