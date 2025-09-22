@@ -15,7 +15,7 @@ export default function SessionChecker({ children }: Props) {
     console.log("session in session checker", session, { status });
     if (session?.error) {
       console.log("sign out trigger");
-      signOut();
+      signOut({redirect:true,redirectTo:'/'});
     }
   }, [session, status]);
 

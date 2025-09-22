@@ -49,9 +49,7 @@ export default function HomePage() {
       </Button>
       <button
         onClick={async () => {
-          console.log("Before update:", session, { status }, "\n");
           const se = await update("updatee");
-          console.log({ se });
         }}
       >
         Trigger update

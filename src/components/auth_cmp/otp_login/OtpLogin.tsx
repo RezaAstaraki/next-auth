@@ -167,7 +167,6 @@ const SendOtpStep = () => {
   // const mutateOtp = useMutation(
   //   { mutationFn: signInOtpAction, mutationKey: ["signInOtp"], 
   //     onSettled:(data)=>{
-  //       console.log('data in on settekled',data)
   //     }
   //   },
   // );
@@ -183,14 +182,13 @@ const SendOtpStep = () => {
       mobile: otpState.mobile,
       request_id: otpState.request_id,
     });
-    console.log("res of op submit ", res);
     if(res.ok){
       dispatch(resetOtp())
       dispatch(setExpirationTime(Number(res.body.exp) - Number(process.env.NEXT_PUBLIC_SECONDS_TO_REDUCE ?? 0) ))
       dispatch(setIsUserLoggedIn({isLoggedIn:true}))
       window.location.href = res.body.url
     }else{
-      console.log('do some thing in else of otp submit')
+      console.warn('do some thing in else of otp submit')
     }
 
   };

@@ -25,16 +25,10 @@ export const userAuthChecker = <
   }, [userSate.loading]);
 
   const isUserLoggedIN = async () => {
-    console.log(
-      userSate.expirationTime > Date.now() / 1000,
-      userSate.expirationTime
-    );
     if (userSate.expirationTime > Date.now() / 1000) {
       return true;
     } else {
       const state = await update("need Update");
-      console.log("return from update in use authChecker", { state });
-
       if (status === null) {
         return false;
       } else {
@@ -78,7 +72,7 @@ export const userAuthChecker = <
       }
 
       if (!(await isUserLoggedIN())) {
-        console.log("second check");
+        console.warn("second check");
       }
 
       const result = await action(...args);

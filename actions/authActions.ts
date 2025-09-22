@@ -1,6 +1,6 @@
 "use server";
 
-import { decode, getToken } from "next-auth/jwt";
+import { decode } from "next-auth/jwt";
 
 import { AuthWithOTPRequestSchemaType } from "@/schemas/authSchemas";
 
@@ -10,8 +10,7 @@ import {
   VerifyOtpResponseJwtType,
   VerifyOtpResponseType,
 } from "./types/BackendApiResponseTypes";
-import { errorResponse } from "@/src/lib/constants/constants";
-import { authorizedHeader, extendedFetchServer } from "@/src/lib/serverUtils";
+import { extendedFetchServer } from "@/src/lib/serverUtils";
 import { User } from "@/schemas/third-party-api-schemas";
 import { jwtDecode } from "jwt-decode";
 import { ApiResponse } from "./types";
@@ -134,7 +133,6 @@ type RefreshResponseType = {
 //         delayTime: 500,
 //       }
 //     );
-//     console.log('res in server action verify otp',res)
 //     if (res.ok) {
 //       const credentials = {
 //         user: JSON.stringify(res.body.user),
@@ -158,7 +156,7 @@ type RefreshResponseType = {
 export async function signInOtpAction(
   data: AuthWithOTPRequestSchemaType
 ): Promise<ApiResponse<any>> {
-  let exp
+  let exp;
   try {
     const res = await extendedFetchServer<VerifyOtpResponseJwtType>(
       "/auth/verify-otp",
@@ -172,7 +170,7 @@ export async function signInOtpAction(
         delayTime: 500,
       }
     );
-   
+
     if (res.ok) {
       const decodedJwt: JWTType = jwtDecode(res.body.access_token);
       const credentials = {
@@ -182,24 +180,27 @@ export async function signInOtpAction(
         refreshToken: res.body.refresh_token,
         accessToken: res.body.access_token,
         // accessTokenExpiration: decodedJwt.exp,
-
-
         //should remove
-        accessTokenExpiration: decodedJwt.exp - Number(process.env.NEXT_PUBLIC_SECONDS_TO_REDUCE ?? 0),
+        accessTokenExpiration:
+          decodedJwt.exp -
+          Number(process.env.NEXT_PUBLIC_SECONDS_TO_REDUCE ?? 0),
       };
-      exp = decodedJwt.exp
+      exp = decodedJwt.exp;
 
-      await ServerSignIn("otp", credentials);
+      await ServerSignIn("otp", {
+        ...credentials,
+        redirectTo: "/dashboard", // or wherever
+        redirect: true,
+      });
     }
     return res;
   } catch (e: any) {
     console.error("signInOtp error:", e);
     if (e.digest && e.digest.startsWith("NEXT_REDIRECT")) {
-      // digest format: NEXT_REDIRECT;type;url;statusCode;
       const parts = e.digest.split(";");
-      const type = parts[1]; // e.g., "push"
-      const url = parts[2]; // e.g., "http://localhost:3000/"
-      const statusCode = parts[3]; // e.g., "307"
+      const type = parts[1]; 
+      const url = parts[2]; 
+      const statusCode = parts[3];
       return {
         ok: true,
         status: Number(statusCode),
@@ -207,7 +208,7 @@ export async function signInOtpAction(
           redirect: true,
           url,
           type,
-          exp
+          exp,
         },
       };
     } else {
@@ -224,16 +225,14 @@ export const signoutAction = async () => {
   await ServerSignOut({ redirect: true });
 };
 
-export const getDecodedToken = async (
-  
-): Promise<JWTType | null> => {
-  const rawToken = (await cookies()).get("authjs.session-token")?.value;
+export const getDecodedToken = async (): Promise<JWTType | null> => {
+  const rawToken = (await cookies()).get(process.env.COOKIE_NAME!)?.value;
   if (!rawToken) return null;
 
   const decodedToken: any = await decode({
     token: rawToken,
     secret: process.env.AUTH_SECRET || "",
-    salt: "authjs.session-token",
+    salt: process.env.COOKIE_NAME!,
   });
   return decodedToken as JWTType;
 };
@@ -262,7 +261,7 @@ export async function refreshTokens(
 }
 
 export async function callAuth() {
-  const session  = await auth();
+  const session = await auth();
   return { called: session };
 }
 
@@ -278,33 +277,5 @@ export async function callSessionServer() {
     },
   });
   const data = await res.json();
-  console.log("Server session:", data);
   return data;
 }
-
-// export async function setNewTokens(res:RefreshResponseType){
-
-//   const decodedJwt: JWTType = jwtDecode(res.access_token);
-//       const credentials = {
-//         user: JSON.stringify(decodedJwt.user),
-//         token_type: res.token_type,
-//         expireIn: res.expires_in,
-//         refreshToken: res.refresh_token,
-//         accessToken: res.access_token,
-//         accessTokenExpiration: decodedJwt.exp,
-//       };
-//       console.log('new credentail',credentials)
-//       await ServerSignIn("otp", credentials);
-// }
-
-// export async function refre(){
-//   const ss =await getDecodedToken()
-//   if(!ss) return
-//   const res = await refreshTokens(ss?.user.refreshToken)
-//   if(res.ok){
-
-//     setNewTokens(res.body)
-//   }else{
-//     console.log(res.errors)
-//   }
-// }

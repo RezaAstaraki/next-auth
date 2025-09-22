@@ -23,7 +23,6 @@ export default function UpdateProfile({}: Props) {
   },{toastContent:'all',hookForm:updateProfileForm});
 
   const submitProfileUpdate = async (data: UpdateProfileSchemaType) => {
-    console.log('data in handle submit update prfole',data)
     updateProfileMutate.mutate(data);
   };
   // useEffect(()=>{
