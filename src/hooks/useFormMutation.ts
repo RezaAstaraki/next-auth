@@ -12,6 +12,7 @@ type UseFormMutationExtra = {
   hookForm?: Pick<UseFormReturn<any>, "setError" | "getValues">;
   toaster?: boolean;
   toastContent: ToastContent;
+  onSuccessToastMessage?: string;
 };
 
 export function useFormMutation<
@@ -26,61 +27,62 @@ export function useFormMutation<
   >,
   extra?: UseFormMutationExtra
 ): UseMutationResult<TData, TError, TVariables, TContext> {
-  const { hookForm, toaster = true, toastContent = "main" } = extra ?? {};
+  const {
+    hookForm,
+    toaster = true,
+    toastContent = "main",
+    onSuccessToastMessage,
+  } = extra ?? {};
 
   return useMutation({
     ...baseOptions,
     onSuccess: (data: any) => {
-      if (hookForm) {
-        if (data.status === 422 && data.errors) {
-          Object.entries(data.errors).forEach(([field, messages]) => {
-            if (Array.isArray(messages) && messages.length > 0) {
-              if (toastContent === "all") {
-                toast.error(`${field}: ${messages.join(", ")}`);
+      if (!data.ok) {
+        if (hookForm) {
+          if (data.status === 422 && data.errors) {
+            Object.entries(data.errors).forEach(([field, messages]) => {
+              if (Array.isArray(messages) && messages.length > 0) {
+                if (toastContent === "all") {
+                  toast.error(`${field}: ${messages.join(", ")}`);
+                }
+                if (field in hookForm.getValues()) {
+                  hookForm.setError(field as any, {
+                    type: "manual",
+                    message: messages.join(", "),
+                  });
+                }
               }
-              if (field in hookForm.getValues()) {
-                hookForm.setError(field as any, {
-                  type: "manual",
-                  message: messages.join(", "),
-                });
+            });
+          }
+        }
+
+        // Show toaster messages
+        if (toaster && data) {
+          switch (toastContent) {
+            case "main":
+              if (data.message) toast.error(data.message);
+              break;
+            case "all":
+              if (data.status !== 422 && data.message) {
+                toast.error(data.message);
               }
-            }
-          });
+              break;
+
+            default:
+              if (toastContent.length > 0) {
+                toast.error(toastContent);
+              }
+              break;
+          }
         }
-      }
 
-      // Show toaster messages
-      if (toaster && data) {
-        switch (toastContent) {
-          case "main":
-            if (data.message) toast.error(data.message);
-            break;
-          case "all":
-            if (data.status !== 422) {
-              toast.error(data.message);
-            }
-            break;
-
-          default:
-            if (toastContent.length > 0) {
-              toast.error(toastContent);
-            }
-            break;
+        // stop further success handling if validation failed
+        if (data.status === 422) {
+          // throw new Error(data.message ?? "Validation failed");
         }
+      } else {
+        if (onSuccessToastMessage) toast.success(onSuccessToastMessage);
       }
-
-      // stop further success handling if validation failed
-      if (data.status === 422) {
-        // throw new Error(data.message ?? "Validation failed");
-      }
-
-      // forward to user-defined onSuccess if provided
-      // baseOptions.onSuccess?.(
-      //   data as TData,
-      //   undefined as any,
-      //   undefined as any,
-      //   undefined as any
-      // );
     },
   });
 }

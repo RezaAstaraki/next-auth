@@ -38,7 +38,7 @@ export const updateProfileSchema = z.object({
     .max(255, "حداکثر طول 255 کاراکتر است")
     .nullable(),
 
-  national_code: z.string().length(10, "تعداد ارقام کد ملی باید 10 رقم است"),
+  national_code: z.string().length(10, "تعداد ارقام کد ملی باید 10 رقم است").optional(),
 
   postal_code: z.string().length(10, "تعداد ارقام کد پستی باید 10 رقم است").or(z.literal("")).nullable(),
 });

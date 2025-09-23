@@ -33,7 +33,7 @@ export default function HomePage() {
       <Button
         onPress={async () => {
           const res = await getDecodedToken();
-          if (res) console.log(res);
+          console.log({decode:res});
         }}
       >
         decode

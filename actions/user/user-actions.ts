@@ -27,7 +27,6 @@ export async function profileUpdate(
         body: JSON.stringify(data),
       },
     },
-    updateProfileSchema
   );
   return res;
 }
