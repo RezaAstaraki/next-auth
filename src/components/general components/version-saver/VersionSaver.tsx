@@ -8,18 +8,18 @@ type Props = {
   className?: string;
   vertical?:boolean
   divider?:string
+  dir?:"ltr"|"rtl" 
 };
 
-export default async function VersionSaver({ className ,vertical,divider}: Props) {
-  // const res = await extendedFetchServer('/up',{
+export default async function VersionSaver({ className ,vertical,divider,dir="ltr" }: Props) {
   const res = await fetch(ServerUrlMaker("/up"), {
     method: "GET",
     cache: "force-cache",
     next:{revalidate:false}
   });
   return (
-    <div className={cn("text-xs",{'flex flex-col':vertical},className)}>
-      <span>
+    <div dir={dir} className={cn("text-xs",{'flex flex-col':vertical},className)}>
+      <span >
         {siteConfig.siteTitle}-Version:{pkg.version}{divider ?? " | "}
       </span>
       <span>

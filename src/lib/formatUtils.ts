@@ -14,10 +14,8 @@ export const formatDate = (dateString: string | null | undefined): string => {
 
   try {
     const date = new Date(dateString);
-
-    // Check for invalid date
     if (isNaN(date.getTime())) {
-      return dateString; // fallback to original string
+      return dateString; 
     }
 
     return new Intl.DateTimeFormat("fa-IR", {
