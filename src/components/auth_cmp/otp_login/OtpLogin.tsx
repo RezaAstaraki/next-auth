@@ -14,7 +14,6 @@ import {
 import {
   resetOtp,
   setOtp,
-  setStep,
 } from "@/src/redux/features/loginotp/loginOtpSlice";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { Button } from "@heroui/button";

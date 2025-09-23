@@ -1,8 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-
-import { revalidateTag } from "next/cache";
-import { errorResponse } from "./constants/constants";
 import { ZodSchema } from "zod";
 import { ApiError } from "@/actions/types";
 import * as z from "zod";
@@ -75,87 +72,6 @@ export function formDataMaker(
 
   return formData;
 }
-
-export async function fetchWithRetry(
-  url: string,
-  headers: HeadersInit,
-  options: RequestInit = {},
-  cacheTime = 0,
-  revalidateTags?: string[] | string,
-  delayTime = 500,
-  retries: number = 3
-): Promise<any> {
-  for (let i = 0; i < retries; i++) {
-    console.warn({ retry: i + 1, url });
-
-    try {
-      const userDefinedCache = "cache" in options || "next" in options;
-
-      const fetchOptions: RequestInit = {
-        ...options,
-        headers,
-        ...(!userDefinedCache &&
-          (cacheTime
-            ? { next: { revalidate: cacheTime } }
-            : { cache: "no-store" })),
-      };
-
-      const res = await fetch(url, fetchOptions);
-
-      return await handleFetchResponse(res, revalidateTags);
-    } catch (e) {
-      console.warn(`Retrying... (${i + 1}/${retries})`, e);
-
-      if (i < retries - 1) {
-        await new Promise((resolve) => setTimeout(resolve, delayTime));
-      } else {
-        return errorResponse;
-      }
-    }
-  }
-}
-
-export async function handleFetchResponse(
-  fetchResult: Response,
-  revalidateTags?: string[] | string
-) {
-  try {
-    const response = await fetchResult.json();
-    if (fetchResult.ok) {
-      if (revalidateTags) {
-        if (typeof revalidateTags === "string") {
-          revalidateTag(revalidateTags);
-        } else {
-          revalidateTags.forEach((tag) => {
-            revalidateTag(tag);
-          });
-        }
-      }
-      return response;
-    } else {
-      const validationErrors = response.errors
-        ? Object.entries(response.errors).flatMap(([key, messages]) =>
-            (messages as string[]).map(
-              (message: string) => `${key}: ${message}`
-            )
-          )
-        : [];
-      return {
-        isSuccess: false,
-        Errors:
-          validationErrors.length > 0
-            ? validationErrors
-            : response.Errors || ["An unknown error occurred."],
-      };
-    }
-  } catch (e) {
-    return {
-      isSuccess: false,
-      Errors: ["An error occurred while fetching"],
-    };
-  }
-}
-
 export async function delay(delayTime: number) {
   await new Promise((resolve) => setTimeout(resolve, delayTime));
 }

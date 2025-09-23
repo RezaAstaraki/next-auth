@@ -14,7 +14,7 @@ type Props = {};
 
 export default function UpdateProfile({}: Props) {
   const updateProfileForm = useForm<UpdateProfileSchemaType>({
-    // resolver: zodResolver(updateProfileSchema),
+    resolver: zodResolver(updateProfileSchema),
   });
 
   const updateProfileMutate = useFormMutation({
