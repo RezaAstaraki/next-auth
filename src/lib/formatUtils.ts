@@ -11,18 +11,24 @@ export const formatToPersianNumber = (
 
 export const formatDate = (dateString: string | null | undefined): string => {
   if (!dateString) return "";
+
   try {
     const date = new Date(dateString);
+
+    // Check for invalid date
+    if (isNaN(date.getTime())) {
+      return dateString; // fallback to original string
+    }
+
     return new Intl.DateTimeFormat("fa-IR", {
       year: "numeric",
       month: "long",
       day: "numeric",
     }).format(date);
-  } catch (e) {
+  } catch {
     return dateString || "";
   }
 };
-
 export const formatSecondsToMinutes = (second: number) => {
   const minutes = Math.floor(second / 60);
   const remainingSeconds = second % 60;
