@@ -1,3 +1,5 @@
+import { User } from "@/schemas/authSchemas";
+
 export type LogInType = {
     signedIn: boolean;
 };
@@ -27,4 +29,5 @@ export type UserDetailType = {
   cardNumber?: string | null;
   shebaNumber?: string | null;
   id: number;
+  roles:User['roles'] | null
 };

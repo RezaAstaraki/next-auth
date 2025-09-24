@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "../redux/store";
 import {
   resetUserState,
   setExpirationTime,
+  setUserDetail,
 } from "../redux/features/customer/userSlice";
 import { useSession } from "next-auth/react";
 import { ApiError, ApiResponse } from "@/actions/types";
@@ -12,7 +13,8 @@ import { ApiError, ApiResponse } from "@/actions/types";
 export const userAuthChecker = <
   T extends (...args: any[]) => Promise<ApiResponse<any>>,
 >(
-  action: T
+  action: T,
+  shouldUpdate: boolean = false
 ) => {
   const dispatch = useAppDispatch();
   const userSate = useAppSelector((state) => state.user);
@@ -25,15 +27,24 @@ export const userAuthChecker = <
   }, [userSate.loading]);
 
   const isUserLoggedIN = async () => {
-    if (userSate.expirationTime > Date.now() / 1000) {
+    if (userSate.expirationTime > Date.now() / 1000 && !shouldUpdate) {
       return true;
     } else {
       const state = await update("need Update");
+      console.log(state);
       if (status === null) {
         return false;
       } else {
-        if (state?.exp ) {
-          dispatch(setExpirationTime(state?.exp))
+        if (state?.exp) {
+          dispatch(setExpirationTime(state?.exp));
+          dispatch(
+            setUserDetail({
+              mobile: state.user.mobile,
+              name: state.user.name,
+              roles:state.user.roles
+              
+            })
+          );
         }
         return true;
       }
@@ -53,7 +64,7 @@ export const userAuthChecker = <
 
   const executeAction = async (
     ...args: Parameters<T>
-  ): Promise<ApiResponse<T> | null> => {
+  ): Promise<Awaited<ReturnType<T>> | ApiError | null> => {
     setLoading(true);
     try {
       // Wait until the Redux loading state becomes false
@@ -63,12 +74,12 @@ export const userAuthChecker = <
       if (!userSate.isLoggedIn) {
         dispatch(resetUserState());
         // dispatch(showCustomerLoginModal());
-        const response: ApiError = {
+
+        return {
           ok: false,
           message: "user is not Logged in",
           status: 401,
         };
-        return response;
       }
 
       if (!(await isUserLoggedIN())) {
@@ -84,10 +95,10 @@ export const userAuthChecker = <
           // dispatch(showCustomerLoginModal());
           return null;
         }
-        return await action(...args);
+        return (await action(...args)) as Awaited<ReturnType<T>>;
       }
 
-      return result;
+      return result as Awaited<ReturnType<T>>;
     } catch (error) {
       console.error("Error executing action:", error);
       return null;

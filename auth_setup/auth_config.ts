@@ -100,6 +100,7 @@ export const authConfig = {
           accessTokenExpiration: credentials.accessTokenExpiration,
           accessToken: credentials.accessToken,
           refreshToken: credentials.refreshToken,
+
         };
       },
     }),
@@ -163,10 +164,19 @@ export const authConfig = {
     },
     session: async ({ session, token, user, trigger }) => {
       session.error = token.error;
+      const receivedToken: any = token.user;
       if (session.user) {
-        const receivedToken: any = token.user;
+        
         session.exp = receivedToken.accessTokenExpiration;
+        // session.user.id = receivedToken.id as number
       }
+        session.user.mobile=receivedToken.mobile
+        session.user.verified_at=receivedToken.verified_at
+        session.user.roles=receivedToken.roles
+        session.user.created_at=receivedToken.created_at
+        // session.user.national_code=receivedToken.national_code
+        // session.user.first_name=receivedToken.first_name
+        // session.user.last_name=receivedToken.last_name
 
 
       return session;

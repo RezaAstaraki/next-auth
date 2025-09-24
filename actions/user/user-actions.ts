@@ -1,12 +1,9 @@
 "use server";
 
-import {
-  updateProfileSchema,
-  UpdateProfileSchemaType,
-  User,
-} from "@/schemas/third-party-api-schemas";
+
 import { extendedFetchServer } from "@/src/lib/serverUtils";
 import { ApiResponse } from "../types";
+import { UpdateProfileSchemaType, User } from "@/schemas/authSchemas";
 
 export async function profileShow() {
   const res = await extendedFetchServer<User>("/profile", {

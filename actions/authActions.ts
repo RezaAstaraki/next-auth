@@ -2,7 +2,7 @@
 
 import { decode } from "next-auth/jwt";
 
-import { AuthWithOTPRequestSchemaType } from "@/schemas/authSchemas";
+import { AuthWithOTPRequestSchemaType, User } from "@/schemas/authSchemas";
 
 import { auth, ServerSignIn, ServerSignOut } from "@/auth_setup/next_auth";
 import { cookies } from "next/headers";
@@ -11,7 +11,7 @@ import {
   VerifyOtpResponseType,
 } from "./types/BackendApiResponseTypes";
 import { extendedFetchServer } from "@/src/lib/serverUtils";
-import { User } from "@/schemas/third-party-api-schemas";
+
 import { jwtDecode } from "jwt-decode";
 import { ApiResponse } from "./types";
 

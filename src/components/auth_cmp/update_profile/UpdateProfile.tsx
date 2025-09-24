@@ -1,8 +1,8 @@
 import { profileShow, profileUpdate } from "@/actions/user/user-actions";
-import {
-  updateProfileSchema,
-  UpdateProfileSchemaType,
-} from "@/schemas/third-party-api-schemas";
+// import {
+//   updateProfileSchema,
+//   UpdateProfileSchemaType,
+// } from "@/schemas/third-party-api-schemas";
 import { useFormMutation } from "@/src/hooks/useFormMutation";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
@@ -11,18 +11,37 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Clo from "../../general components/client logger/Clo";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Skeleton } from "@heroui/react";
+import { userAuthChecker } from "@/src/hooks/useAuthChecker";
+import {
+  updateProfileSchema,
+  UpdateProfileSchemaType,
+} from "@/schemas/authSchemas";
+import { useAppDispatch } from "@/src/redux/store";
+import { setUserDetail } from "@/src/redux/features/customer/userSlice";
 
 type Props = {};
 
 export default function UpdateProfile({}: Props) {
+  const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
   const updateProfileForm = useForm<UpdateProfileSchemaType>({
     resolver: zodResolver(updateProfileSchema),
   });
 
+  const { executeAction: ProfileUpdateA } = userAuthChecker(profileUpdate);
+  const { executeAction: profileShowA } = userAuthChecker(profileShow);
+
   const updateProfileMutate = useFormMutation(
     {
-      mutationFn: profileUpdate,
+      mutationFn: ProfileUpdateA,
       mutationKey: ["updateProfile"],
+      onSettled: (data) => {
+        if (data?.ok) {
+          queryClient.invalidateQueries({ queryKey: ["profileShow"] });       
+          dispatch(setUserDetail({...data.body}));
+        }
+      },
     },
     {
       toastContent: "all",
@@ -40,7 +59,7 @@ export default function UpdateProfile({}: Props) {
 
   const getProfileQuery = useQuery({
     queryKey: ["profileShow"],
-    queryFn: profileShow,
+    queryFn: profileShowA,
   });
 
   useEffect(() => {
@@ -56,32 +75,20 @@ export default function UpdateProfile({}: Props) {
     }
   }, [getProfileQuery.isFetching]);
 
-  const queryClient = useQueryClient();
-
   return (
     <>
-      {getProfileQuery.isFetched && (
+      <Button onPress={() => getProfileQuery.refetch()} type="button">
+        revalidate refetch
+      </Button>
+      <Button onPress={() => {}} type="button">
+        revalidate method two
+      </Button>
+
+      {!getProfileQuery.isPending ? (
         <form
           className="gap-4 border flex flex-col p-4"
           onSubmit={updateProfileForm.handleSubmit(submitProfileUpdate)}
         >
-          <Button onPress={() => getProfileQuery.refetch()} type="button">
-            revalidate refetch
-          </Button>
-          <Button
-            onPress={() => {
-              queryClient.invalidateQueries({ queryKey: ["profileShow"] });
-            }}
-            type="button"
-          >
-            revalidate method two
-          </Button>
-          {getProfileQuery.isPending ? (
-            <>Loading .........................</>
-          ) : (
-            <Clo data={getProfileQuery.data?.ok} />
-          )}
-
           <Input
             placeholder="first name"
             errorMessage={
@@ -122,6 +129,8 @@ export default function UpdateProfile({}: Props) {
           />
           <Button type="submit">submit</Button>
         </form>
+      ) : (
+        <Skeleton className="w-[250px] h-[360px] rounded" />
       )}
     </>
   );
