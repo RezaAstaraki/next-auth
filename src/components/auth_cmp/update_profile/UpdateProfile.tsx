@@ -1,4 +1,3 @@
-import { profileShow, profileUpdate } from "@/actions/user/user-actions";
 // import {
 //   updateProfileSchema,
 //   UpdateProfileSchemaType,
@@ -19,6 +18,7 @@ import {
 } from "@/schemas/authSchemas";
 import { useAppDispatch } from "@/src/redux/store";
 import { setUserDetail } from "@/src/redux/features/customer/userSlice";
+import { profileShow, profileUpdate } from "@/auth_setup/user/user-actions";
 
 type Props = {};
 

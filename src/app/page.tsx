@@ -5,11 +5,12 @@ import OtpLogin from "../components/auth_cmp/otp_login/OtpLogin";
 import { otpres } from "@/test";
 import { jwtDecode } from "jwt-decode";
 import { callAuth, callSessionServer, getDecodedToken } from "@/actions/authActions";
-import { profileShow } from "@/actions/user/user-actions";
+
 import UpdateProfile from "../components/auth_cmp/update_profile/UpdateProfile";
 import { userAuthChecker } from "../hooks/useAuthChecker";
 import { useAppDispatch, useAppSelector } from "../redux/store";
 import { setUserLoading } from "../redux/features/customer/userSlice";
+import { profileShow } from "@/auth_setup/user/user-actions";
 
 const ff = async () => {
   const res = await fetch("/api/auth/session", {
