@@ -11,6 +11,7 @@ import {
   useDraggable,
 } from "@heroui/react";
 import { useEffect, useRef } from "react";
+import UpdateProfile from "../../auth_cmp/update_profile/UpdateProfile";
 // import LoginForm from "../../auth_cmp/login/LoginForm";
 
 type Props = {};
@@ -28,6 +29,7 @@ export default function RootModal({}: Props) {
     backdrop,
     isDraggable,
     modalTitle,
+    onclose,
   } = useAppSelector((state) => state.modal);
   const dispatch = useAppDispatch();
 
@@ -44,7 +46,12 @@ export default function RootModal({}: Props) {
         ref={targetRef}
         isOpen={isOpen}
         onClose={() => {
-          dispatch(setModalClose());
+          if (isCloseAllowed) {
+            if (onclose) {
+              eval(onclose);
+            }
+            dispatch(setModalClose());
+          }
         }}
         scrollBehavior={scrollBehavior}
         size={size}
@@ -54,18 +61,17 @@ export default function RootModal({}: Props) {
       >
         <ModalContent>
           {isDraggable ? (
-            <ModalHeader {...moveProps} className="flex flex-col gap-1">
+            <ModalHeader {...moveProps} className="flex flex-col gap-1 items-center justify-center">
               {modalTitle && modalTitle}
             </ModalHeader>
           ) : (
-            <ModalHeader className="flex flex-col gap-1">
+            <ModalHeader className="flex flex-col gap-1 items-center justify-center">
               {modalTitle && modalTitle}
             </ModalHeader>
           )}
           <ModalBody>
-            {/* {type === "ss" && <LoginForm />} */}
-            
-            </ModalBody>
+            {type === "update_profile" && <UpdateProfile />}
+          </ModalBody>
         </ModalContent>
       </Modal>
     </>

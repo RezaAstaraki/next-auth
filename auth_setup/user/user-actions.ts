@@ -2,8 +2,9 @@
 
 
 import { extendedFetchServer } from "@/src/lib/serverUtils";
-import { ApiResponse } from "../types";
+
 import { UpdateProfileSchemaType, User } from "@/schemas/authSchemas";
+import { ApiResponse } from "@/actions/types";
 
 export async function profileShow() {
   const res = await extendedFetchServer<User>("/profile", {

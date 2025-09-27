@@ -19,15 +19,19 @@ import {
 import { useAppDispatch } from "@/src/redux/store";
 import { setUserDetail } from "@/src/redux/features/customer/userSlice";
 import { profileShow, profileUpdate } from "@/auth_setup/user/user-actions";
+import { setAllowClose, setModalClose } from "@/src/redux/features/modal/modalSlice";
 
-type Props = {};
+type Props = {
+  onSubmit?: string;
+};
 
-export default function UpdateProfile({}: Props) {
+export default function UpdateProfile() {
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
   const updateProfileForm = useForm<UpdateProfileSchemaType>({
     resolver: zodResolver(updateProfileSchema),
   });
+
 
   const { executeAction: ProfileUpdateA } = userAuthChecker(profileUpdate);
   const { executeAction: profileShowA } = userAuthChecker(profileShow);
@@ -36,10 +40,13 @@ export default function UpdateProfile({}: Props) {
     {
       mutationFn: ProfileUpdateA,
       mutationKey: ["updateProfile"],
-      onSettled: (data) => {
+      onSettled: async (data) => {
         if (data?.ok) {
-          queryClient.invalidateQueries({ queryKey: ["profileShow"] });       
-          dispatch(setUserDetail({...data.body}));
+          queryClient.invalidateQueries({ queryKey: ["profileShow"] });
+          dispatch(setAllowClose())
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          dispatch(setUserDetail({ ...data.body }));
+          dispatch(setModalClose())
         }
       },
     },
@@ -77,13 +84,6 @@ export default function UpdateProfile({}: Props) {
 
   return (
     <>
-      <Button onPress={() => getProfileQuery.refetch()} type="button">
-        revalidate refetch
-      </Button>
-      <Button onPress={() => {}} type="button">
-        revalidate method two
-      </Button>
-
       {!getProfileQuery.isPending ? (
         <form
           className="gap-4 border flex flex-col p-4"

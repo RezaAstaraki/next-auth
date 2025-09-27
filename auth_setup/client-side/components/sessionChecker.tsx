@@ -17,6 +17,10 @@ export default function SessionChecker({ children }: Props) {
       console.log("sign out trigger");
       signOut({redirect:true,redirectTo:'/'});
     }
+    if (Number(session?.exp) < (Date.now() / 1000)) {
+      console.log("update by session checker")
+      update('need update')
+    }
   }, [session, status]);
 
   return <>{children}</>;
