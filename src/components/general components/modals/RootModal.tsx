@@ -20,7 +20,7 @@ export default function RootModal({}: Props) {
   const {
     isOpen,
     type,
-    isCloseAllowed,
+    disallowAClose,
     payloadData,
     size,
     scrollBehavior,
@@ -46,7 +46,7 @@ export default function RootModal({}: Props) {
         ref={targetRef}
         isOpen={isOpen}
         onClose={() => {
-          if (isCloseAllowed) {
+          if (!disallowAClose) {
             if (onclose) {
               eval(onclose);
             }
@@ -61,7 +61,10 @@ export default function RootModal({}: Props) {
       >
         <ModalContent>
           {isDraggable ? (
-            <ModalHeader {...moveProps} className="flex flex-col gap-1 items-center justify-center">
+            <ModalHeader
+              {...moveProps}
+              className="flex flex-col gap-1 items-center justify-center"
+            >
               {modalTitle && modalTitle}
             </ModalHeader>
           ) : (

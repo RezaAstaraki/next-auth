@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export type OpenModalType = {
   type: string;
   payloadData?: any;
-  isCloseAllowed?: ModalInitialStatesType["isCloseAllowed"];
+  disallowAClose?: ModalInitialStatesType["disallowAClose"];
   size?: typeSizes;
   scrollBehavior?: ModalInitialStatesType["scrollBehavior"];
   isDismissable?: ModalInitialStatesType["isDismissable"];
@@ -33,7 +33,7 @@ type ModalInitialStatesType = {
   type: string;
   size?: typeSizes;
   payloadData?: any;
-  isCloseAllowed?: boolean;
+  disallowAClose?: boolean;
   scrollBehavior: "inside" | "normal" | "outside";
   isDismissable?: boolean;
   placement?:
@@ -52,7 +52,7 @@ type ModalInitialStatesType = {
 // Defining the initial state for the modal
 const initialState: ModalInitialStatesType = {
   isOpen: false,
-  isCloseAllowed: true,
+  disallowAClose: false,
   type: "",
   scrollBehavior: "inside",
   isDismissable: true,
@@ -69,12 +69,12 @@ const ModalSlice = createSlice({
   reducers: {
     // Action to allow the modal to be closed
     setAllowClose: (state) => {
-      state.isCloseAllowed = true;
+      state.disallowAClose = false;
     },
 
     // Action to disallow the modal to be closed
     setDisallowAClose: (state) => {
-      state.isCloseAllowed = false;
+      state.disallowAClose = true;
     },
 
     // Action to open the modal with a specific type, size, and optional data
@@ -87,14 +87,14 @@ const ModalSlice = createSlice({
       state.placement = action.payload.placement;
       state.isDraggable = action.payload.isDraggable;
       state.modalTitle = action.payload.modalTitle;
-      state.isCloseAllowed = action.payload.isCloseAllowed;
+      state.disallowAClose = action.payload.disallowAClose;
       state.backdrop = action.payload.backdrop;
       state.onclose = action.payload.onclose;
     },
 
     // Action to close the modal (only if closing is allowed)
     setModalClose: (state) => {
-      if (state.isCloseAllowed || state.isCloseAllowed == undefined) {
+      if (!state.disallowAClose || state.disallowAClose == undefined) {
         if (state.onclose) {
           eval(state.onclose);
         }
@@ -106,7 +106,7 @@ const ModalSlice = createSlice({
         state.placement = undefined;
         state.isDraggable = undefined;
         state.modalTitle = undefined;
-        state.isCloseAllowed = true;
+        state.disallowAClose = false;
         state.onclose = undefined;
         state.isOpen = false;
       }
