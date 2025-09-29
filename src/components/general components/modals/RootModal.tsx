@@ -11,6 +11,7 @@ import {
   useDraggable,
 } from "@heroui/react";
 import { useEffect, useRef } from "react";
+import CreditValidationRequest from "../../credit-validation/CreditValidationRequest";
 import UpdateProfile from "../../auth_cmp/update_profile/UpdateProfile";
 // import LoginForm from "../../auth_cmp/login/LoginForm";
 
@@ -30,6 +31,7 @@ export default function RootModal({}: Props) {
     isDraggable,
     modalTitle,
     onclose,
+    className
   } = useAppSelector((state) => state.modal);
   const dispatch = useAppDispatch();
 
@@ -59,7 +61,7 @@ export default function RootModal({}: Props) {
         placement={placement}
         backdrop={backdrop}
       >
-        <ModalContent>
+        <ModalContent className={className}>
           {isDraggable ? (
             <ModalHeader
               {...moveProps}
@@ -73,6 +75,10 @@ export default function RootModal({}: Props) {
             </ModalHeader>
           )}
           <ModalBody>
+            {type === "credit-validation-request" && (
+              <CreditValidationRequest />
+            )}
+
             {type === "update_profile" && <UpdateProfile />}
           </ModalBody>
         </ModalContent>

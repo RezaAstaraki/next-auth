@@ -12,6 +12,7 @@ export type OpenModalType = {
   isDraggable?: ModalInitialStatesType["isDraggable"];
   modalTitle?: ModalInitialStatesType["modalTitle"];
   onclose?: ModalInitialStatesType["onclose"];
+  className?: ModalInitialStatesType["className"];
 };
 
 // Defining a custom type for modal sizes
@@ -47,6 +48,7 @@ type ModalInitialStatesType = {
   isDraggable?: boolean;
   modalTitle?: string;
   onclose?: string;
+  className?: string;
 };
 
 // Defining the initial state for the modal
@@ -90,6 +92,7 @@ const ModalSlice = createSlice({
       state.disallowAClose = action.payload.disallowAClose;
       state.backdrop = action.payload.backdrop;
       state.onclose = action.payload.onclose;
+      state.className = action.payload.className;
     },
 
     // Action to close the modal (only if closing is allowed)
