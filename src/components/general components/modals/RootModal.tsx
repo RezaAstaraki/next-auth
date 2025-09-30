@@ -3,16 +3,8 @@
 import { setModalClose } from "@/src/redux/features/modal/modalSlice";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalHeader,
-  useDraggable,
-} from "@heroui/react";
-import { useEffect, useRef } from "react";
+import { Modal, ModalBody, ModalContent, ModalHeader } from "@heroui/react";
 import UpdateProfile from "../../auth_cmp/update_profile/UpdateProfile";
-// import LoginForm from "../../auth_cmp/login/LoginForm";
 
 type Props = {};
 
@@ -27,24 +19,16 @@ export default function RootModal({}: Props) {
     isDismissable,
     placement,
     backdrop,
-    isDraggable,
     modalTitle,
     onclose,
-    className
+    className,
   } = useAppSelector((state) => state.modal);
   const dispatch = useAppDispatch();
-
-  const targetRef = useRef(null);
-  const { moveProps } = useDraggable({
-    targetRef,
-    canOverflow: true,
-    isDisabled: !isOpen,
-  });
 
   return (
     <>
       <Modal
-        ref={targetRef}
+        className="overflow-y-hidden"
         isOpen={isOpen}
         onClose={() => {
           if (!disallowAClose) {
@@ -61,21 +45,11 @@ export default function RootModal({}: Props) {
         backdrop={backdrop}
       >
         <ModalContent className={className}>
-          {isDraggable ? (
-            <ModalHeader
-              {...moveProps}
-              className="flex flex-col gap-1 items-center justify-center"
-            >
-              {modalTitle && modalTitle}
-            </ModalHeader>
-          ) : (
-            <ModalHeader className="flex flex-col gap-1 items-center justify-center">
-              {modalTitle && modalTitle}
-            </ModalHeader>
-          )}
-          <ModalBody>
+          <ModalHeader className="flex flex-col gap-1 items-center justify-center">
+            {modalTitle && modalTitle}
+          </ModalHeader>
 
-
+          <ModalBody className="">
             {type === "update_profile" && <UpdateProfile />}
           </ModalBody>
         </ModalContent>

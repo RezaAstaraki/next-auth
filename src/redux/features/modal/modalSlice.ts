@@ -9,7 +9,6 @@ export type OpenModalType = {
   isDismissable?: ModalInitialStatesType["isDismissable"];
   placement?: ModalInitialStatesType["placement"];
   backdrop?: ModalInitialStatesType["backdrop"];
-  isDraggable?: ModalInitialStatesType["isDraggable"];
   modalTitle?: ModalInitialStatesType["modalTitle"];
   onclose?: ModalInitialStatesType["onclose"];
   className?: ModalInitialStatesType["className"];
@@ -45,7 +44,6 @@ type ModalInitialStatesType = {
     | "top"
     | "top-center";
   backdrop?: "opaque" | "blur" | "transparent";
-  isDraggable?: boolean;
   modalTitle?: string;
   onclose?: string;
   className?: string;
@@ -60,7 +58,6 @@ const initialState: ModalInitialStatesType = {
   isDismissable: true,
   placement: "auto",
   backdrop: "blur",
-  isDraggable: true,
   onclose: undefined,
 };
 
@@ -87,7 +84,6 @@ const ModalSlice = createSlice({
       state.payloadData = action.payload.payloadData;
       state.isDismissable = action.payload.isDismissable;
       state.placement = action.payload.placement;
-      state.isDraggable = action.payload.isDraggable;
       state.modalTitle = action.payload.modalTitle;
       state.disallowAClose = action.payload.disallowAClose;
       state.backdrop = action.payload.backdrop;
@@ -107,7 +103,6 @@ const ModalSlice = createSlice({
         state.size = undefined;
         state.isDismissable = undefined;
         state.placement = undefined;
-        state.isDraggable = undefined;
         state.modalTitle = undefined;
         state.disallowAClose = false;
         state.onclose = undefined;
