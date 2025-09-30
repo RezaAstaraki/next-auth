@@ -53,6 +53,11 @@ type OtpCredentials = {
 
 export const authConfig = {
   session: { strategy: "jwt" },
+    cookies:{
+    sessionToken:{
+      name:process.env.COOKIE_NAME
+    }
+  },
   providers: [
     //--------------------simple version-----------------------//
     // Credentials({
